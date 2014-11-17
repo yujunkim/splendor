@@ -1,0 +1,11 @@
+#splendor data-uri=("#{ request.host}:#{ request.port }/websocket")
+.container
+  .row
+    #door.col-md-4.col-md-offset-4
+      .count
+        |0
+      .buttons
+        button.join.btn.btn-success
+          |join
+        button.leave.btn.btn-danger
+          |leave
