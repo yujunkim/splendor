@@ -1,0 +1,13 @@
+.noble-padder
+  .noble
+    .left
+      .point-padder
+        .count{class: "count-#{@model.get("point")}"}
+      .costs
+        - _.each(@model.get("costs"), (count, type) ->
+          - if count > 0
+            .cost-padder
+              .count{class: "color-#{type} count-#{count}"}
+
+        - )
+

@@ -13,6 +13,45 @@
  *= require_tree .
  *= require_self
  */
+/* http://meyerweb.com/eric/tools/css/reset/
+ * v2.0 | 20110126
+ * License: none (public domain)
+.center-center
+  display: flex
+  justify-content: center
+  align-items: center
+
+.color-diamond
+  background-color: white
+.color-sapphire
+  background-color: blue
+.color-emerald
+  background-color: green
+.color-ruby
+  background-color: red
+.color-onyx
+  background-color: black
+.count
+  background-size: cover
+  background-position: center center
+  &.count-1
+    background-image: image-url("points/1.png")
+  &.count-2
+    background-image: image-url("points/2.png")
+  &.count-3
+    background-image: image-url("points/3.png")
+  &.count-4
+    background-image: image-url("points/4.png")
+  &.count-5
+    background-image: image-url("points/5.png")
+  &.count-6
+    background-image: image-url("points/6.png")
+  &.count-7
+    background-image: image-url("points/7.png")
+
+html, body
+  width: 100%
+  height: 100%
 
 #door
   border: solid 1px black
@@ -20,3 +59,448 @@
   .count
     font-size: 20px
 
+.card-padder
+  width: 100%
+  padding-bottom: 142.85%
+  position: relative
+  .card
+    position: absolute
+    width: 100%
+    height: 100%
+    border-radius: 3%
+    overflow: hidden
+    .header
+      height: 25%
+      .jewel-padder, .point-padder
+        width: 36%
+        padding-bottom: 36%
+        position: relative
+      .point-padder
+        float: left
+        .count
+          position: absolute
+          width: 100%
+          height: 100%
+          //width: 165%
+          //height: 165%
+          //left: -35%
+          //top: -25%
+      .jewel-padder
+        float: right
+        .jewel
+          position: absolute
+          width: 100%
+          height: 100%
+          border-radius: 50%
+          background-size: 110%
+          background-repeat: no-repeat
+          background-position: center center
+        .jewel.diamond
+          background-image: image-url("jewels/diamond.png")
+        .jewel.sapphire
+          background-image: image-url("jewels/sapphire.png")
+        .jewel.emerald
+          background-image: image-url("jewels/emerald.png")
+        .jewel.ruby
+          background-image: image-url("jewels/ruby.png")
+        .jewel.onyx
+          background-image: image-url("jewels/onyx.png")
+        .jewel.gold
+          background-image: image-url("jewels/gold.png")
+    .middle
+      height: 75%
+      .costs
+        width: 25%
+        position: absolute
+        bottom: 0
+        .cost-padder
+          width: 80%
+          padding-bottom: 80%
+          position: relative
+          margin: 10%
+          .round
+            position: absolute
+            width: 100%
+            height: 100%
+            background-size: cover
+            .count
+              width: 100%
+              height: 100%
+          .round.diamond
+            background-image: image-url("rounds/diamond.png")
+          .round.sapphire
+            background-image: image-url("rounds/sapphire.png")
+          .round.emerald
+            background-image: image-url("rounds/emerald.png")
+          .round.ruby
+            background-image: image-url("rounds/ruby.png")
+          .round.onyx
+            background-image: image-url("rounds/onyx.png")
+
+.card
+  color: transparent
+  &.revealed
+    color: black
+    .header
+      background-color: cadetblue
+      .point-padder
+        .point
+          border: solid 1px black
+      .jewel-padder
+        .jewel
+    .middle
+      background-color: darkslategray
+  &:not(.revealed)
+    background-image: image-url("cards/back.png")
+    background-size: cover
+    background-repeat: no-repeat
+    background-position: center center
+
+
+.card-list
+  position: relative
+  .card-view
+    width: 100%
+    position: absolute
+    .card
+      border: solid 1px black
+
+.card-list.card-list-pack
+  @for $i from 1 through 50
+    .card-view.card-view-#{$i}
+      margin-top: #{$i * -0.2%}
+
+.card-list.card-list-exhibition
+  .card-view
+  @for $i from 1 through 4
+    .card-view.card-view-#{$i}
+      left: #{$i * 105%}
+
+.card-list.card-list-reservation
+  @for $i from 1 through 3
+    .card-view.card-view-#{$i}
+      margin-top: #{$i * 30%}
+      left: #{$i * 30%}
+
+.card-list.card-list-purchased
+  @for $i from 1 through 20
+    .card-view.card-view-#{$i}
+      margin-top: #{$i * 30%}
+
+.jewel-chip-padder
+  width: 100%
+  padding-bottom: 80.58%
+  position: relative
+  .jewel-chip
+    position: absolute
+    width: 100%
+    height: 100%
+    background-size: contain
+    background-repeat: no-repeat
+  .jewel-chip.diamond
+    background-image: image-url("jewel_chips/diamond.png")
+  .jewel-chip.sapphire
+    background-image: image-url("jewel_chips/sapphire.png")
+  .jewel-chip.emerald
+    background-image: image-url("jewel_chips/emerald.png")
+  .jewel-chip.ruby
+    background-image: image-url("jewel_chips/ruby.png")
+  .jewel-chip.onyx
+    background-image: image-url("jewel_chips/onyx.png")
+  .jewel-chip.gold
+    background-image: image-url("jewel_chips/gold.png")
+.jewel-chip-list
+  position: relative
+  .jewel-chip-view
+    width: 100%
+    position: absolute
+
+.jewel-chip-list
+  @for $i from 1 through 50
+    .jewel-chip-view.jewel-chip-view-#{$i}
+      margin-top: #{$i * -10%}
+
+.noble-padder
+  width: 100%
+  padding-bottom: 100%
+  position: relative
+  .noble
+    position: absolute
+    width: 100%
+    height: 100%
+    border-radius: 5%
+    overflow: hidden
+    background-color: blanchedalmond
+    .left
+      width: 30%
+      height: 100%
+      position: relative
+      background-color: lavender
+      .point-padder
+        width: 70%
+        padding-bottom: 70%
+        position: relative
+        margin: 10% 15%
+        float: left
+        .count
+          position: absolute
+          width: 100%
+          height: 100%
+      .costs
+        position: absolute
+        bottom: 0
+        width: 100%
+        .cost-padder
+          width: 50%
+          padding-bottom: 70%
+          position: relative
+          margin: 10% auto
+          .count
+            position: absolute
+            width: 100%
+            height: 100%
+
+
+.game
+  .user
+    position: absolute
+    width: 54%
+    height: 30%
+    border-radius: 10px
+    .background
+      position: absolute
+      width: 100%
+      height: 100%
+      opacity: 0.1
+      border-radius: 10px
+      background-color: white
+    .card-list
+      position: absolute
+      width: 11.523%
+      top: 1%
+    .card-list-purchased.diamond
+      left: 15.934%
+    .card-list-purchased.sapphire
+      left: 28.485%
+    .card-list-purchased.emerald
+      left: 41.037%
+    .card-list-purchased.ruby
+      left: 53.588%
+    .card-list-purchased.onyx
+      left: 66.139%
+    .card-list.card-list-reservation
+      left: 80%
+      top: 20%
+    .jewel-chip-list
+      position: absolute
+      width: 8.230%
+      top: 81.893%
+    .jewel-chip-list.diamond
+      left: 16.786%
+    .jewel-chip-list.sapphire
+      left: 29.543%
+    .jewel-chip-list.emerald
+      left: 42.3%
+    .jewel-chip-list.ruby
+      left: 55.057%
+    .jewel-chip-list.onyx
+      left: 67.814%
+    .jewel-chip-list.gold
+      left: 84.572%
+    .noble-list
+      position: absolute
+      top: 1%
+      left: 2.5%
+      width: 11%
+      .noble-view
+        width: 100%
+        position: absolute
+      @for $i from 1 through 4
+        .noble-view.noble-view-#{$i}
+          margin-top: #{$i * 105%}
+  .user.others.top
+    left: 19%
+    transform: rotate(180deg)
+    -webkit-transform: rotate(180deg)
+  .user.others.left
+    transform: rotate(90deg)
+    -webkit-transform: rotate(90deg)
+    top: 45%
+    left: -13%
+  .user.others.right
+    transform: rotate(270deg)
+    -webkit-transform: rotate(270deg)
+    top: 25%
+    left: 60%
+  .user.me
+    width: 54%
+    height: 30%
+    top: 70%
+    left: 27%
+  .user.current-turn
+    border: solid 1px black
+
+  .center-field
+    top: 30%
+    left: 27%
+    width: 46%
+    height: 40%
+    position: absolute
+    .card-list
+      position: absolute
+    .card-list.card-list-pack
+      width: 13.52657%
+      left: 7.729%
+    .card-list.card-list-exhibition
+      width: 13.52657%
+      left: 23.913%
+    .card-list.level3
+      top: 20.370%
+    .card-list.level2
+      top: 46.604%
+    .card-list.level1
+      top: 72.839%
+    .jewel-chip-list
+      position: absolute
+      width: 9.662%
+      left: 83.091%
+    .jewel-chip-list.diamond
+      top: 8%
+    .jewel-chip-list.sapphire
+      top: 24%
+    .jewel-chip-list.emerald
+      top: 40%
+    .jewel-chip-list.ruby
+      top: 56%
+    .jewel-chip-list.onyx
+      top: 72%
+    .jewel-chip-list.gold
+      top: 87%
+    .noble-list
+      position: absolute
+      width: 12.56%
+      top: 2%
+      left: 25%
+      .noble-view
+        width: 100%
+        position: absolute
+      @for $i from 1 through 4
+        .noble-view.noble-view-#{$i}
+          left: #{$i * 115%}
+
+  .action-field
+    border: solid 1px black
+    border-radius: 10px
+    position: absolute
+    width: 19%
+    height: 30%
+    top: 70%
+    left: 81%
+    .card-list
+      position: absolute
+      width: 32.75%
+      left: 7%
+      top: 4%
+    .jewel-chip-list.receive
+      position: absolute
+      //width: 23.390%
+      width: 35%
+      left: 60%
+      top: 20%
+    .jewel-chip-list.return
+      position: absolute
+      //width: 23.390%
+      width: 35%
+      left: 60%
+      top: 65%
+    > .header, > .footer
+      position: absolute
+      width: 100%
+      text-align: center
+    > .header
+      top: 0
+    > .footer
+      bottom: 0
+
+  .zoom-field
+    position: absolute
+    width: 19%
+    height: 30%
+    .jewel-chip-view
+      width: 50%
+      float: left
+
+.game-view
+  width: 100%
+
+.game-padder
+  width: 100%
+  padding-bottom: 90%
+  position: relative
+  .game
+    position: absolute
+    width: 100%
+    height: 100%
+    overflow: hidden
+    background-image: image-url("background.jpg")
+    background-repeat: no-repeat
+    background-size: 100%
+
+#chat
+  .panel
+    margin-bottom: 0
+  .chat-list
+    list-style: none
+    margin: 0
+    padding: 0
+    li
+      margin-bottom: 10px
+      padding-bottom: 5px
+      position: relative
+      .thumbnail
+        padding: 0
+        margin: 0
+        border-radius: 10px
+        position: absolute
+        left: 0
+        width: 40px
+        height: 40px
+      .chat-body
+        margin-left: 50px
+        p
+          word-wrap: break-word
+          margin: 0
+          color: #777777
+        small
+          margin-left: 15px
+  .slidedown .fa, .panel-heading > .fa
+    margin-right: 5px
+
+  .panel-body
+    overflow-y: scroll
+    height: calc(100% - 92px)
+
+#users
+  .user
+    position: relative
+    .thumbnail
+      padding: 0
+      margin: 0
+      position: absolute
+      left: 10px
+      top: 6px
+      width: 15px
+      height: 15px
+      border-radius: 5px
+    .name
+      margin-left: 12px
+@media screen and (min-aspect-ratio: 10/9)
+  .game-view
+    width: 111.11111vh
+    float: left
+  #chat
+    width: calc(100% - 111.11111vh)
+    float: right
+    height: 100%
+    .panel
+      height: 100%

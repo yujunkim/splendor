@@ -1,35 +1,71 @@
 $ ->
-  window.splendorController = new Splendor.Controller($('#splendor').data('uri'), true);
+  window.splendorController = new Splendor.Controller($(document.body).data("websocket-uri"), true);
+  cf.reset() if cf?
 
 
 window.Splendor = {}
-
-class Splendor.User
-  constructor: (@user_name) ->
-  serialize: => { user_name: @user_name }
+window.Dic = {
+  card: {},
+  user: {},
+  jewelChip: {},
+  noble: {}
+}
 
 class Splendor.Controller
   constructor: (url,useWebSockets) ->
-    @messageQueue = []
     @dispatcher = new WebSocketRails(url,useWebSockets)
-    @dispatcher.on_open = @createUser
+    @channel = @dispatcher.subscribe('aaa_channel')
+    @dispatcher.on_open = @ready
     @bindEvents()
 
   bindEvents: =>
-    $('#door .join').on 'click', @joinGame
-    @dispatcher.bind 'join_game', @newMessage
-    #@dispatcher.bind 'user_list', @updateUserList
-    #$('input#user_name').on 'keyup', @updateUserInfo
-    #$('#send').on 'click', @sendMessage
-    #$('#message').keypress (e) -> $('#send').click() if e.keyCode == 13
+    @channel.bind 'action_performed', @actionPerformed
 
-  createUser: =>
-    rand_num = Math.floor(Math.random()*1000)
-    @user = new Splendor.User("Guest_" + rand_num)
-    @dispatcher.trigger 'new_user', @user.serialize()
+    @channel.bind 'new_message', @newMessage
+    @dispatcher.bind 'start_game', @gameStarted
+    @dispatcher.bind 'update_users', @updateUsers
 
-  joinGame: =>
-    @dispatcher.trigger 'join_game', @user.serialize()
+  getUser: (id) ->
+    Dic.user[id]
+
+  addUser: (userHash) ->
+    user = new BSplendor.Models.User(userHash)
+    Dic.user[user.get("id")] = user
+    user
+
+  ready: =>
+    window.operator = new BSplendor.Models.Operator(splendorController: @)
+    ov = new BSplendor.Views.Operator.Base(model: operator)
+    ov.render()
+    $(document.body).prepend(ov.el)
+
+  updateUsers: (users) =>
+    users.forEach (userHash) =>
+      unless user = @getUser(userHash.id)
+        user = @addUser(userHash)
+      user.set(userHash)
+    $(window).trigger("user-updated")
+
+  gameStarted: (options)=>
+    window.game = new BSplendor.Models.Game(options)
+    gv = new BSplendor.Views.Game.Base(model: game)
+    gv.render()
+    $(document.body).prepend(gv.el)
+    $('#start').off 'click'
+    $('#start').remove()
+    $('#restart').off 'click'
+    $('#restart').remove()
+
+  actionPerformed: (message)=>
+    console.log(message)
+    game.actionPerformed(message.type, message.d)
+
+  action: (type, data) =>
+    @dispatcher.trigger "action", {
+      game_id: game.id,
+      type: type,
+      d: data
+    }
 
   newMessage: (message) =>
-    debugger
+    window.operator.newMessage(message) if window.operator

@@ -1,0 +1,6 @@
+.footer.btn-group
+  %button#action.btn.btn-primary.btn-sm
+    action
+  %button#reset.btn.btn-danger.btn-sm
+    reset
+

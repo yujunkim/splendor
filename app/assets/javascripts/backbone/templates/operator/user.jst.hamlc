@@ -1,0 +1,5 @@
+%li.user
+  %a{href: "#"}
+    .thumbnail{style: "background-color: #{@get("color")}"}
+    %span.name
+      = @get("name")

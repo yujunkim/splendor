@@ -14,6 +14,11 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require turbolinks
+//= require underscore
+//= require backbone
+//= require backbone_rails_sync
+//= require backbone_datalink
+//= require backbone/splendor
 //= require_tree .
 //= require websocket_rails/main
-
+//= require hamlcoffee

@@ -1,0 +1,18 @@
+.card-padder
+  .card
+    .header
+      - if @model.get("point") > 0
+        .point-padder
+          .count.center-center{class: "count-#{@model.get("point")}"}
+      .jewel-padder
+        .jewel{class: "#{@model.get("jewelType")}"}
+    .middle
+      .costs
+        - _.each(@model.get("costs"), (count, type) ->
+          - if count > 0
+            .cost-padder
+              .round{class: type}
+                .count{class: "count-#{count}"}
+        - )
+
+

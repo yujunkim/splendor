@@ -1,0 +1,18 @@
+/- card = Card.last
+.card-padder
+  .card
+    .header
+      - if card.point > 0
+        .point-padder
+          .point.center-center class="point-#{card.point}"
+            = card.point
+      .jewel-padder
+        .jewel class="color-#{card.jewel_type}"
+    .middle
+      .costs
+        - card.costs.each do |type, count|
+          - if count > 0
+            .cost-padder
+              .cost.center-center class="color-#{type}"
+                = count
+
