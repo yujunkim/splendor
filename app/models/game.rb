@@ -6,7 +6,15 @@ class Game < ActiveRecord::Base
   has_many :jewels
   has_many :nobles
 
-  def self.generate(users)
+  # {
+  #   user_ids: [],
+  #   robot_count: 0
+  # }
+  def self.generate(options)
+    users = User.where(user_id: options[:user_ids]).to_a
+    options[:robot_count].times do |i|
+      users << User.create(robot: true)
+    end
     g = Game.create
     g.users = users
 
@@ -48,11 +56,12 @@ class Game < ActiveRecord::Base
 
   def after_action(user, type, options)
     next_turn
-    WebsocketRails[:aaa_channel].subscribers.each do |connection|
+    WebsocketRails["game#{id}"].subscribers.each do |connection|
       connection.send_message :action_performed, type: type,
-        d: game_update_data(connection.user, options)
+        d: game_update_data(user, options)
     end
-    Resque.enqueue(Robot, self.id) if self.current_turn_user.robot
+
+    Robot.play(id) if self.current_turn_user.robot
   end
 
   #purchased_card: @purchased_card,

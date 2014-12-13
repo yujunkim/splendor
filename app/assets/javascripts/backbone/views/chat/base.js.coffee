@@ -9,6 +9,7 @@ class BSplendor.Views.Chat.Base extends Backbone.View
   template: JST["backbone/templates/chat/base"]
 
   initialize: () ->
+    @model.on("user-updated", @render, @)
 
   render: ->
     @$el.html(@template @)

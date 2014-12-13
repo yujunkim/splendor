@@ -1,9 +1,9 @@
 -#%li.clearfix{class: "#{if @model.me() then "me"}", style: "color: #{@model.get("userColor")}"}
-.thumbnail{style: "background-color: #{@model.get("userColor")}"}
+.thumbnail{style: "background-color: #{@model.get("user").get("color")}"}
 .chat-body.clearfix
   .header
     %strong.primary-font
-      = @model.get("userName")
+      = @model.get("user").get("name")
     %small.text-muted
       %span.fa.fa-clock-o
       %span.clock

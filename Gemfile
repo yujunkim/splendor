@@ -40,7 +40,3 @@ gem 'execjs'
 gem 'haml'
 gem 'active_model_serializers', "0.8.1"
 gem 'forgery'
-gem 'resque'
-gem 'resque-web', "0.0.5", require: 'resque_web'
-gem "redis"
-gem "hiredis"

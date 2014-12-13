@@ -3,9 +3,6 @@ class BSplendor.Models.Chat extends Backbone.Model
     purchase: "purchase"
 
   initialize: (options)->
-    @refreshData(options.game)
-
-  refreshData: (game)=>
 
   me: ()=>
-    operator.get("id") == @get("userId")
+    @get("user").me

@@ -3,16 +3,14 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   include CurrentUser
 
   def user_msg(ev, msg)
-    WebsocketRails[:aaa_channel].trigger ev, userId: current_user.id,
-                          userName: current_user.name,
-                          userColor: current_user.color,
+    broadcast_message ev, userId: current_user.id,
                           received: Time.now.strftime("%Y-%m-%d %H:%M:%S"),
                           text: ERB::Util.html_escape(msg)
   end
 
   def setting
-    if message.has_key?(:robotfy)
-      current_user.robot = !!message[:robotfy]
+    if message.has_key?(:robotify)
+      current_user.robot = !!message[:robotify]
       current_user.save
       update_users
     elsif message.has_key?(:username)
@@ -27,10 +25,10 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   end
 
   def update_users(options = {})
-    WebsocketRails[:aaa_channel].subscribers.each do |connection|
-      users = WebsocketRails[:aaa_channel].subscribers.map do |c|
+    WebsocketRails.users.each do |connection|
+      users = WebsocketRails.users.map do |c|
         next if options[:except] && options[:except].id == c.user.id
-        UserSerializer.new(c.user, scope: connection.user, root: false)
+        UserSerializer.new(c.user.reload, scope: connection.user.reload, root: false)
       end
       users.compact!
 
@@ -38,12 +36,18 @@ class SplendorWebsocketController < WebsocketRails::BaseController
     end
   end
 
+  # {
+  #   user_ids: [],
+  #   robot_count: 0
+  # }
   def start_game
-    game = Game.generate(connected_users)
-    WebsocketRails[:aaa_channel].subscribers.each do |connection|
-      connection.send_message(
-        :start_game, GameSerializer.new(game, scope: connection.user)
-      )
+    game = Game.generate(message)
+    WebsocketRails.users.each do |connection|
+      if game.users.include?(connection.user)
+        connection.send_message(
+          :start_game, GameSerializer.new(game, scope: connection.user)
+        )
+      end
     end
   end
 
@@ -74,12 +78,12 @@ class SplendorWebsocketController < WebsocketRails::BaseController
 
   def client_connected
     connection_store[:token] = current_user.auth_token
-    user_msg :new_message, "joined chat room"
     update_users
+    user_msg :new_message, "joined chat room"
   end
 
   def client_disconnected
+    update_users
     user_msg :new_message, "left chat room"
-    update_users(except: current_user)
   end
 end

@@ -13,7 +13,7 @@ class BSplendor.Views.ChatList.Base extends Backbone.View
     @collection.on('add', @addOne, @)
     @collection.on('remove', @render, @)
 
-  render: ->
+  render: =>
     @$el.children().remove()
     @collection.forEach(@addOne, @)
     this

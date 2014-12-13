@@ -8,8 +8,11 @@
         %li#recolor
           %a{href: "#"}
             %span.fa.fa-refresh.fa-spin.fa-fw
-            Refresh
-        %li.divider
+            Recolor
+        %li#robotify
+          %a{href: "#"}
+            %span.fa.fa-refresh.fa-spin.fa-fw
+            Robotify
         %li#rename
           %a{href: "#"}
             %span.fa.fa-male.fa-fw

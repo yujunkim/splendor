@@ -1,7 +1,5 @@
 class Robot
-  @queue = :robot
-
-  def self.perform(game_id)
+  def self.play(game_id)
     game = Game.find_by_id(game_id)
     return unless game.current_turn_user.robot
     sleep(1)

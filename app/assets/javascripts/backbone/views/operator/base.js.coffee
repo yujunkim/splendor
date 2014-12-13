@@ -8,7 +8,7 @@ class BSplendor.Views.Operator.Base extends Backbone.View
     "click #restart": "restartGame"
     "click #rename": "rename"
     "click #recolor": "recolor"
-    "click #robotfy": "robotfy"
+    "click #robotify": "robotify"
     "keypress #message": "messageKeypressed"
     "mouseenter .operation-dropdown": "dropdownMouseentered"
     "mouseleave .operation-dropdown": "dropdownMouseleaved"
@@ -39,8 +39,8 @@ class BSplendor.Views.Operator.Base extends Backbone.View
   recolor: ->
     splendorController.dispatcher.trigger 'setting', color: true
 
-  robotfy: ->
-    splendorController.dispatcher.trigger 'setting', robotfy: true
+  robotify: ->
+    splendorController.dispatcher.trigger 'setting', robotify: true
 
   sendMessage: (e) =>
     e.preventDefault()

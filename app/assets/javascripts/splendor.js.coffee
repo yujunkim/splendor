@@ -14,14 +14,11 @@ window.Dic = {
 class Splendor.Controller
   constructor: (url,useWebSockets) ->
     @dispatcher = new WebSocketRails(url,useWebSockets)
-    @channel = @dispatcher.subscribe('aaa_channel')
     @dispatcher.on_open = @ready
     @bindEvents()
 
   bindEvents: =>
-    @channel.bind 'action_performed', @actionPerformed
-
-    @channel.bind 'new_message', @newMessage
+    @dispatcher.bind 'new_message', @newMessage
     @dispatcher.bind 'start_game', @gameStarted
     @dispatcher.bind 'update_users', @updateUsers
 
@@ -40,6 +37,7 @@ class Splendor.Controller
     $(document.body).prepend(ov.el)
 
   updateUsers: (users) =>
+    console.log users
     users.forEach (userHash) =>
       unless user = @getUser(userHash.id)
         user = @addUser(userHash)
@@ -47,6 +45,9 @@ class Splendor.Controller
     $(window).trigger("user-updated")
 
   gameStarted: (options)=>
+    @channel = @dispatcher.subscribe("game#{options.game.id}")
+    @dispatcher.bind 'action_performed', @actionPerformed
+
     window.game = new BSplendor.Models.Game(options)
     gv = new BSplendor.Views.Game.Base(model: game)
     gv.render()
@@ -57,7 +58,7 @@ class Splendor.Controller
     $('#restart').remove()
 
   actionPerformed: (message)=>
-    console.log(message)
+    console.log message
     game.actionPerformed(message.type, message.d)
 
   action: (type, data) =>
