@@ -6,7 +6,6 @@ class BSplendor.Views.ActionField.Base extends Backbone.View
 
   events:
     'click #action': 'action'
-    'click #reset': 'reset'
 
   template: JST["backbone/templates/action_field/base"]
 
@@ -33,6 +32,3 @@ class BSplendor.Views.ActionField.Base extends Backbone.View
 
   action: =>
     @model.action()
-
-  reset: =>
-    @model.reset()

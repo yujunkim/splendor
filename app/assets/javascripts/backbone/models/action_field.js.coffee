@@ -3,7 +3,40 @@ class BSplendor.Models.ActionField extends Backbone.Model
   initialize: ->
     @refreshData()
     [@cardList, @receiveJewelChipList, @returnJewelChipList].forEach (collection) =>
-      collection.on 'all', () => @trigger('refresh')
+      collection.on 'all', () => @collectionChanged()
+
+  collectionChanged: () =>
+    @set(enable: @actionEnable())
+    @trigger('refresh')
+
+  actionEnable: ()=>
+    enable = true
+    switch @get("type")
+      when "purchaseCard"
+        card = @cardList.models[0]
+        costs = []
+        _.each card.get("costs"), (cost, jewelType) ->
+          _(game.me.actualCost(jewelType, cost)).times () ->
+            costs.push(jewelType)
+        goldCount = 0
+        @returnJewelChipList.models.forEach (jewelChip) ->
+          return unless enable
+          if jewelChip.get("jewelType") == "gold"
+            goldCount++
+          else
+            idx = $.inArray(jewelChip.get("jewelType"), costs)
+            if idx >= 0
+              costs.splice idx, 1
+            else
+              enable = false
+        enable &&= goldCount >= costs.length
+      when "reserveCard"
+        undefined
+      when "receiveJewelChip"
+        enable &&= (game.me.totalJewelChipCount() + @receiveJewelChipList.length) <= 10
+      else
+        enable = false
+    enable
 
   refreshData: =>
     options = { actionField: @ }
@@ -24,11 +57,12 @@ class BSplendor.Models.ActionField extends Backbone.Model
     _(@receiveJewelChipList.models.length).times () =>
       tmpJewelChip = @receiveJewelChipList.models[0]
       tmpJewelChip.collection.remove(tmpJewelChip)
-      game.centerField.jewelChip[tmpJewelChip.get("type")].add(tmpJewelChip)
+      game.centerField.jewelChip[tmpJewelChip.get("jewelType")].add(tmpJewelChip)
     _(@returnJewelChipList.models.length).times () =>
       tmpJewelChip = @returnJewelChipList.models[0]
       tmpJewelChip.collection.remove(tmpJewelChip)
-      game.me.jewelChip[tmpJewelChip.get("type")].add(tmpJewelChip)
+      game.me.jewelChip[tmpJewelChip.get("jewelType")].add(tmpJewelChip)
+    @collectionChanged()
 
   pushCardList: (card, type) =>
     card.collection.remove(card)
@@ -40,7 +74,7 @@ class BSplendor.Models.ActionField extends Backbone.Model
 
   popReceive: (jewelChip) ->
     jewelChip.collection.remove(jewelChip)
-    game.centerField.jewelChip[jewelChip.get("type")].add(jewelChip)
+    game.centerField.jewelChip[jewelChip.get("jewelType")].add(jewelChip)
     if @receiveJewelChipList.models.length == 0
       @reset()
 
@@ -50,7 +84,8 @@ class BSplendor.Models.ActionField extends Backbone.Model
 
   popReturn: (jewelChip) ->
     jewelChip.collection.remove(jewelChip)
-    game.me.jewelChip[jewelChip.get("type")].add(jewelChip)
+    game.me.jewelChip[jewelChip.get("jewelType")].add(jewelChip)
+    @collectionChanged()
 
   changeType: (type) =>
     return if @get("type") == type
@@ -79,7 +114,7 @@ class BSplendor.Models.ActionField extends Backbone.Model
         splendorController.action("purchase_card", @serialize())
       when "reserveCard"
         splendorController.action("reserve_card", @serialize())
-      when "receiveJewel"
-        splendorController.action("receive_jewel", @serialize())
+      when "receiveJewelChip"
+        splendorController.action("receive_jewel_chip", @serialize())
     @reset()
 

@@ -1,0 +1,13 @@
+.username.center-center.font-size-2{style: "color: #{@get("color")}"}
+  = @get("name")
+.jewel-stats
+  - for jewelType in ["diamond", "sapphire", "emerald", "ruby", "onyx", "gold"]
+    .jewel-stat
+      .jewel{class: jewelType}
+      .point.center-center.font-size-4
+        = @ability(jewelType)
+.etc-stats
+  .point.center-center.font-size-4
+    = @totalPoint()
+  .card-count.center-center.font-size-4
+    = @totalCardCount()

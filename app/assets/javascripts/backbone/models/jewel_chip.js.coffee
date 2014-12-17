@@ -1,28 +1,25 @@
 class BSplendor.Models.JewelChip extends Backbone.Model
 
-  defaults:
-    type: 'diamond'
-
   initialize: ->
 
   pushReceive: =>
 
   pushReturn: =>
-    game.returnJewel @
+    game.returnJewelChip @
 
   popReceive: =>
-    game.popActionField("receiveJewel", jewelChip:  @)
+    game.popActionField("receiveJewelChip", jewelChip:  @)
 
   popReturn: =>
-    game.popActionField("returnJewel", jewelChip:  @)
+    game.popActionField("returnJewelChip", jewelChip:  @)
 
   clicked: ->
     if @collection.centerField
-      game.receiveJewel @
+      game.receiveJewelChip @
     else if @collection.actionField
       if @collection.type == "receive"
         game.actionField.popReceive(@)
       else if @collection.type == "return"
         game.actionField.popReturn(@)
     else if @collection.user && @collection.user.get("me")
-      game.returnJewel @
+      game.returnJewelChip @

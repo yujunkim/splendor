@@ -5,42 +5,58 @@ class BSplendor.Views.Operator.Base extends Backbone.View
   events:
     "click #send": "sendMessage"
     "click #start": "startGame"
+    "click #cancel-start": "cancelStartGame"
     "click #restart": "restartGame"
     "click #rename": "rename"
     "click #recolor": "recolor"
     "click #robotify": "robotify"
     "keypress #message": "messageKeypressed"
-    "mouseenter .operation-dropdown": "dropdownMouseentered"
-    "mouseleave .operation-dropdown": "dropdownMouseleaved"
+    "click .list-group .list-group-item": "toggleActive"
+    "click .list-arrows .arrow": "arrowClicked"
+    "keyup .search": "search"
+    "click .number-spinner .sign": "numberSpinnerSignClicked"
 
-  template: JST["backbone/templates/operator/base"]
+  className: "operator"
+
+  doorTemplate: JST["backbone/templates/operator/door"]
+  chatTemplate: JST["backbone/templates/operator/chat"]
+  userTemplate: JST["backbone/templates/operator/user"]
 
   initialize: () ->
-    @$el.attr("id", "chat")
-    $(window).on "user-updated", @updateUser
+    $(window).on "user.updated", @updateUser
 
   messageKeypressed: (e)->
     @sendMessage(e) if e.keyCode == 13
     $('#send').on 'click', @sendMessage
 
+  cancelStartGame: ->
+    @$el.find("#game-door").removeClass("invite-mode")
+
   startGame: ->
-    splendorController.dispatcher.trigger 'start_game'
+    gameDoor = @$el.find("#game-door")
+    if gameDoor.hasClass("invite-mode")
+      robotCount = parseInt(@$el.find("#robot-count").val())
+      robotCount = 0 if robotCount == NaN
+      userIds = []
+      @$el.find("#participants").find("li.user").each () ->
+        userIds.push $(@).data("id")
+      if 2 <= userIds.length + robotCount  <= 4
+        splendorController.dispatcher.trigger 'start_game', {robot_count: robotCount, user_ids: userIds}
+    else
+      @$el.find("#game-door").addClass("invite-mode")
 
   restartGame: ->
     splendorController.dispatcher.trigger 'restart_game'
 
   rename: ->
-    name = prompt("set rename")
-    debugger
-    if name?
-      "hi"
-      #splendorController.dispatcher.trigger 'setting', username: name
+    name = prompt("set rename", Splendor.Me.get("name"))
+    splendorController.dispatcher.trigger 'setting', username: name if name?
 
   recolor: ->
     splendorController.dispatcher.trigger 'setting', color: true
 
   robotify: ->
-    splendorController.dispatcher.trigger 'setting', robotify: true
+    splendorController.dispatcher.trigger 'setting', robotify: !Splendor.Me.get("robot")
 
   sendMessage: (e) =>
     e.preventDefault()
@@ -50,32 +66,65 @@ class BSplendor.Views.Operator.Base extends Backbone.View
     messageEl.val('')
 
   render: ->
-    @$el.html(@template @)
+    @$el.append(@doorTemplate @).append(@chatTemplate @)
     chatListView = new BSplendor.Views.ChatList.Base
       collection: @model.chatList,
     chatListView.render()
     @$el.find(".panel-body").append(chatListView.el)
 
-  dropdownMouseentered: (e)->
-    el = $(e.currentTarget)
-    unless el.hasClass("open")
-      el.find(".dropdown-toggle").dropdown('toggle')
-
-  dropdownMouseleaved: (e)->
-    el = $(e.currentTarget)
-    if el.hasClass("open")
-      el.find(".dropdown-toggle").dropdown('toggle')
-
   usersTemplate: ()->
     el = []
-    _.each Dic.user, (user, userId) ->
-      userTemplate = $(JST["backbone/templates/operator/user"](user))
+    _.each Splendor.Users, (user, userId) =>
+      userTemplate = $(@userTemplate user)
       el.push(userTemplate)
     el
 
   updateUser: () =>
-    if @$el? && @$el.find("#users")?
-      @$el.find("#users").empty()
-      @$el.find("#users").append(@usersTemplate())
+    if @$el? && @$el.find("#chat")?
+      @$el.find("#chat .user-list").empty()
+      @$el.find("#chat .user-list").append(@usersTemplate())
+    if @$el? && @$el.find("#game-door")?
+      @$el.find("#game-door .user-list.user-list-base").empty()
+      @$el.find("#game-door .user-list.user-list-base").append(@usersTemplate())
 
+  toggleActive: (e)->
+    $(e.currentTarget).toggleClass "active"
 
+  arrowClicked: (e)->
+    btn = $(e.currentTarget)
+    actives = ""
+    if btn.attr("data-dir") is "left"
+      actives = $(".list-right ul li.active")
+      actives.clone().removeClass("active").appendTo ".list-left ul"
+      actives.remove()
+    else if btn.attr("data-dir") is "right"
+      actives = $(".list-left ul li.active")
+      actives.clone().removeClass("active").appendTo ".list-right ul"
+      actives.remove()
+
+  search: (e) ->
+    code = e.keyCode or e.which
+    return if code is "9"
+    searchElem = $(e.currentTarget)
+    searchElem.val null  if code is "27"
+    listElems = searchElem.parents(".dual-list").find(".list-group li")
+    val = $.trim(searchElem.val()).replace(RegExp(" +", "g"), " ").toLowerCase()
+    listElems.show().filter(->
+      text = $(@).text().replace(/\s+/g, " ").toLowerCase()
+      not ~text.indexOf(val)
+    ).hide()
+
+  numberSpinnerSignClicked: (e) ->
+    btn = $(e.currentTarget)
+    oldValue = btn.closest(".number-spinner").find("input").val().trim()
+    newVal = 0
+    if btn.attr("data-dir") is "up"
+      newVal = parseInt(oldValue) + 1
+    else
+      newVal = parseInt(oldValue) - 1
+
+    if newVal < 0
+      newVal = 0
+    else if newVal > 3
+      newVal = 3
+    btn.closest(".number-spinner").find("input").val newVal

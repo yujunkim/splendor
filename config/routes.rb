@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   root to: "games#index"
   resources :games, only: [:index, :show] do
+    member do
+      get :default_robot_play_data
+      get :robot_play
+    end
   end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

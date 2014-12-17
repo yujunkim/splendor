@@ -32,5 +32,5 @@ class BSplendor.Models.CenterField extends Backbone.Model
     @exhibition[level].add(sample)
 
   returnJewelChip: (jewelChip) =>
-    @jewelChip[jewelChip.get("type")].add jewelChip
+    @jewelChip[jewelChip.get("jewelType")].add jewelChip
 

@@ -1,1 +1,5 @@
+.header.font-size-2
+  %span.username
+    = @model.get("name")
+  %i.fa.fa-arrow-down.fa-fw
 .background

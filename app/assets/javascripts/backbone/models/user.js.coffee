@@ -1,6 +1,10 @@
 class BSplendor.Models.User extends Backbone.Model
 
   initialize: ->
+    @on "change", ()=>
+      @addStyle("background-color")
+      @addStyle("color")
+
 
   setupGame: =>
     options = { user: @ }
@@ -25,10 +29,31 @@ class BSplendor.Models.User extends Backbone.Model
     @reservationCardList.add(card)
 
   receive: (jewelChip) =>
-    @jewelChip[jewelChip.get("type")].add(jewelChip)
+    @jewelChip[jewelChip.get("jewelType")].add(jewelChip)
 
   hire: (noble) =>
     @nobleList.add(noble)
+
+  totalJewelChipCount: ()=>
+    count = 0
+    _.each @jewelChip, (collection, jewelType) ->
+      count += collection.length
+    count
+
+  totalCardCount: ()=>
+    count = 0
+    _.each @purchased, (collection, jewelType) ->
+      count += collection.length
+    count
+
+  totalPoint: ()=>
+    point = 0
+    _.each @purchased, (collection, jewelType) ->
+      collection.models.forEach (card) ->
+        point += card.get("point")
+    @nobleList.forEach (noble) ->
+      point += noble.get("point")
+    point
 
   ability: (jewelType) =>
     @jewelChip[jewelType].length + @purchased[jewelType].length
@@ -66,3 +91,10 @@ class BSplendor.Models.User extends Backbone.Model
   unsetCurrentTurn: ()=>
     @set(currentTurn: undefined)
 
+  addStyle: (style) ->
+    stylesheet = document.styleSheets[0]
+    selector = ".user.hovered .user-#{style}-#{@get("id")}"
+    rule = "{#{style}: #{@get("color")} !important"
+    if stylesheet.insertRule
+      stylesheet.insertRule selector + rule, stylesheet.cssRules.length
+    else stylesheet.addRule selector, rule, -1  if stylesheet.addRule

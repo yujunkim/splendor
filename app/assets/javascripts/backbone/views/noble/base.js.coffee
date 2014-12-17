@@ -3,8 +3,7 @@ BSplendor.Views.Noble = {}
 class BSplendor.Views.Noble.Base extends Backbone.View
 
   events:
-    'mouseenter': 'mouseentered'
-    'mouseleave': 'mouseleaved'
+    "mousemove": "mousemoved"
 
   className: 'noble-view'
 
@@ -16,10 +15,6 @@ class BSplendor.Views.Noble.Base extends Backbone.View
     @$el.addClass("noble-view-#{@collection.indexOf(@model)}") if @collection?
     @$el.html @template @
 
-  mouseentered: (e) =>
-    game.zoomField.visualize("noble", @model)
-    e.stopPropagation()
-
-  mouseleaved: (e) =>
-    game.zoomField.reset()
-    e.stopPropagation()
+  mousemoved: (e) ->
+    e.stopPropagation() unless @model.collection? && @model.collection.user?
+    game.trigger("gameChildHovered", e, @)

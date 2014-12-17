@@ -1,6 +1,6 @@
-class CreateJewels < ActiveRecord::Migration
+class CreateJewelChips < ActiveRecord::Migration
   def change
-    create_table :jewels do |t|
+    create_table :jewel_chips do |t|
       t.integer :user_id
       t.integer :game_id
       t.string :jewel_type

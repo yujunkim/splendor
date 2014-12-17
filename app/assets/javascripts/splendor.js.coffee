@@ -4,12 +4,7 @@ $ ->
 
 
 window.Splendor = {}
-window.Dic = {
-  card: {},
-  user: {},
-  jewelChip: {},
-  noble: {}
-}
+window.Splendor.Users = {}
 
 class Splendor.Controller
   constructor: (url,useWebSockets) ->
@@ -23,43 +18,52 @@ class Splendor.Controller
     @dispatcher.bind 'update_users', @updateUsers
 
   getUser: (id) ->
-    Dic.user[id]
+    Splendor.Users[id]
 
   addUser: (userHash) ->
     user = new BSplendor.Models.User(userHash)
-    Dic.user[user.get("id")] = user
+    Splendor.Users[user.get("id")] = user
+    Splendor.Me = user if user.get("me")
     user
 
-  ready: =>
+  removeUser: (id) ->
+    delete Splendor.Users[id]
+
+  ready: ()=>
     window.operator = new BSplendor.Models.Operator(splendorController: @)
     ov = new BSplendor.Views.Operator.Base(model: operator)
     ov.render()
     $(document.body).prepend(ov.el)
 
   updateUsers: (users) =>
-    console.log users
+    totalUserIds = _.map Splendor.Users, (user, id) => user.get("id")
     users.forEach (userHash) =>
       unless user = @getUser(userHash.id)
         user = @addUser(userHash)
       user.set(userHash)
-    $(window).trigger("user-updated")
+      totalUserIds = _.without(totalUserIds, user.get("id"))
+    totalUserIds.forEach (removedUserId) =>
+      @removeUser(removedUserId)
+    $(window).trigger("user.updated")
 
   gameStarted: (options)=>
     @channel = @dispatcher.subscribe("game#{options.game.id}")
     @dispatcher.bind 'action_performed', @actionPerformed
+    @dispatcher.bind 'game_over', @gameOver
 
-    window.game = new BSplendor.Models.Game(options)
+    window.game = new BSplendor.Models.Game(options.game)
     gv = new BSplendor.Views.Game.Base(model: game)
     gv.render()
     $(document.body).prepend(gv.el)
-    $('#start').off 'click'
-    $('#start').remove()
-    $('#restart').off 'click'
-    $('#restart').remove()
+    $("#game-door").remove()
 
-  actionPerformed: (message)=>
+  actionPerformed: (message)->
     console.log message
     game.actionPerformed(message.type, message.d)
+
+  gameOver: (message)->
+    console.log message
+    game.gameOver(message.winner)
 
   action: (type, data) =>
     @dispatcher.trigger "action", {

@@ -4,8 +4,7 @@ class BSplendor.Views.JewelChip.Base extends Backbone.View
 
   events:
     'click': 'clicked'
-    'mouseenter': 'mouseentered'
-    'mouseleave': 'mouseleaved'
+    "mousemove": "mousemoved"
 
   className: 'jewel-chip-view'
 
@@ -16,14 +15,12 @@ class BSplendor.Views.JewelChip.Base extends Backbone.View
   render: ->
     @$el.addClass("jewel-chip-view-#{@collection.indexOf(@model)}") if @collection?
     @$el.html @template @
-    @$el.find(".jewel-chip").addClass(@model.get("type"))
+    @$el.find(".jewel-chip").addClass(@model.get("jewelType"))
 
   clicked: =>
     @model.clicked()
 
-  mouseentered: (e) =>
+  mousemoved: (e) ->
     return unless @collection
-    game.zoomField.visualize("jewelChipList", @collection)
-
-  mouseleaved: (e) =>
-    game.zoomField.reset()
+    e.stopPropagation() unless @model.collection? && @model.collection.user?
+    game.trigger("gameChildHovered", e, @)

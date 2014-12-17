@@ -1,4 +1,4 @@
-class NobleSerializer < ActiveModel::Serializer
+class NobleSerializer < Thriftify
   attributes :id,
              :point,
              :userId,

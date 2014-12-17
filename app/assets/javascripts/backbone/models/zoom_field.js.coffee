@@ -11,3 +11,4 @@ class BSplendor.Models.ZoomField extends Backbone.Model
     @set(type: undefined)
     @set(visualizeModel: undefined)
     @trigger("refresh")
+

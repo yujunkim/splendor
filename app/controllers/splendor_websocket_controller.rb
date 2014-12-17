@@ -4,6 +4,8 @@ class SplendorWebsocketController < WebsocketRails::BaseController
 
   def user_msg(ev, msg)
     broadcast_message ev, userId: current_user.id,
+                          userName: current_user.name,
+                          userColor: current_user.color,
                           received: Time.now.strftime("%Y-%m-%d %H:%M:%S"),
                           text: ERB::Util.html_escape(msg)
   end
@@ -42,6 +44,7 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   # }
   def start_game
     game = Game.generate(message)
+    return unless game
     WebsocketRails.users.each do |connection|
       if game.users.include?(connection.user)
         connection.send_message(
@@ -49,11 +52,12 @@ class SplendorWebsocketController < WebsocketRails::BaseController
         )
       end
     end
+    Robot.play(game.id) if game.current_turn_user.robot
   end
 
   def restart_game
     game = current_user.games.last
-    send_message :start_game, GameSerializer.new(game, scope: current_user)
+    send_message :start_game, GameSerializer.new(game, scope: current_user) if game
   end
 
   def new_message
@@ -66,13 +70,11 @@ class SplendorWebsocketController < WebsocketRails::BaseController
 
   # message
   # {
-  #   type: "purchase_card", "reserve_card", "receive_jewel"
+  #   type: "purchase_card", "reserve_card", "receive_jewel_chip"
   #   d: ...
   # }
   def action
-    return unless ["purchase_card", "reserve_card", "receive_jewel"].include?(message[:type])
-    options = game.send(message[:type], current_user, message[:d])
-    game.after_action(current_user, message[:type], options)
+    game.action(current_user, message)
   end
 
 

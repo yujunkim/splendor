@@ -1,13 +1,13 @@
-class JewelSerializer < ActiveModel::Serializer
+class JewelChipSerializer < Thriftify
   attributes :id,
              :userId,
-             :type
+             :jewelType
 
   def userId
     object.user_id
   end
 
-  def type
+  def jewelType
     object.jewel_type
   end
 end

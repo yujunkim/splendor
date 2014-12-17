@@ -1,4 +1,4 @@
-class CardSerializer < ActiveModel::Serializer
+class CardSerializer < Thriftify
   attributes :id,
              :userId,
              :cardGrade,
@@ -9,7 +9,7 @@ class CardSerializer < ActiveModel::Serializer
              :reserved
 
   def revealed
-    object.revealed || (options[:scope] && options[:scope].id == object.user_id)
+    @revealed ||= !!(object.revealed || (options[:scope] && options[:scope].id == object.user_id))
   end
 
   def userId

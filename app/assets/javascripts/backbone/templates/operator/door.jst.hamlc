@@ -1,0 +1,25 @@
+#game-door
+  .door-padder
+    .door-container
+      .invite.font-size-2
+        .dual-list.list-left
+          .input-set
+            %input.font-size-2.form-control.search{:type => "text"}
+            %i.fa.fa-search.center-center{"data-dir" => "down"}
+          %ul.user-list.user-list-base.list-group
+        .list-arrows.center-center
+          %i.fa.fa-chevron-right.fa-fw.arrow.font-size-3{"data-dir" => "right"}
+          %i.fa.fa-chevron-left.fa-fw.arrow.font-size-3{"data-dir" => "left"}
+        .dual-list.list-right
+          .number-spinner
+            .input-set
+              %input#robot-count.form-control.text-center{:type => "text", :value => "0"}
+              %i.fa.fa-android.sign.center-center{"data-dir" => "down"}
+              %i.fa.fa-minus.sign.center-center{"data-dir" => "down"}
+              %i.fa.fa-plus.sign.center-center{"data-dir" => "up"}
+          %ul#participants.user-list.list-group
+        .clear
+      .icons
+        %i#cancel-start.fa.fa-times.fa-fw.font-size-10
+        %i#start.fa.fa-play.fa-fw.font-size-10
+        %i#restart.fa.fa-sign-in.fa-fw.font-size-10

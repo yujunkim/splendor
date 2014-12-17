@@ -2,12 +2,21 @@ BSplendor.Views.Game = {}
 
 class BSplendor.Views.Game.Base extends Backbone.View
 
+  events:
+    "mousemove": "mousemoved"
+
   className: 'game-view'
 
   template: JST["backbone/templates/game/base"]
 
   initialize: () ->
     @model.on 'reset-end', @render, @
+    @model.on 'game.over', @addStatField, @
+
+  mousemoved: (e)->
+    game.resetHighlightPurchasableCards()
+    @model.zoomField.reset()
+    @model.hoverAlone(@$el)
 
   render: ->
     @$el.html(@template @)
@@ -34,4 +43,11 @@ class BSplendor.Views.Game.Base extends Backbone.View
       userView.render()
       game.append userView.el
       i += 1 unless user.get('me')
+    @addStatField()
 
+  addStatField: ->
+    if @model.statField
+      view = new BSplendor.Views.StatField.Base
+        model: @model.statField
+      view.render()
+      @$el.find(".game").append view.el

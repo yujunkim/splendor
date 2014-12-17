@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   has_many :games, through: :game_user_association
   has_many :my_turn_games, class_name: :Game, foreign_key: :next_turn_user_id
   has_many :cards
-  has_many :jewels
+  has_many :jewel_chips
   has_many :nobles
 
   before_create :fill_auth_token
@@ -25,23 +25,24 @@ class User < ActiveRecord::Base
 
   def purchase(card)
     card.user_id = self.id
+    card.reserved = false
     card.save
   end
 
   def reserve(card)
     card.user_id = self.id
-    card.reserved = self.id
+    card.reserved = true
     card.save
   end
 
-  def receive(jewel)
-    jewel.user_id = self.id
-    jewel.save
+  def receive(jewel_chip)
+    jewel_chip.user_id = self.id
+    jewel_chip.save
   end
 
-  def return(jewel)
-    jewel.user_id = nil
-    jewel.save
+  def return(jewel_chip)
+    jewel_chip.user_id = nil
+    jewel_chip.save
   end
 
   def hire(noble)
@@ -73,7 +74,7 @@ class User < ActiveRecord::Base
   def purchasable?(card)
     card.costs.map do |jewel_type, cost|
       card_count = Card.where(game_id: card.game.id, user_id: id, jewel_type: jewel_type, reserved: false).count
-      jewel_count = Jewel.where(game_id: card.game.id, user_id: id, jewel_type: jewel_type).count
+      jewel_count = JewelChip.where(game_id: card.game.id, user_id: id, jewel_type: jewel_type).count
       card_count + jewel_count >= cost
     end.uniq == [true]
   end
@@ -87,12 +88,39 @@ class User < ActiveRecord::Base
     costs
   end
 
-  def return_jewels(card)
-    jewels = []
+  def return_jewel_chips(card)
+    jewel_chips = []
     actual_cost(card).each do |jewel_type, cost|
       next if cost <= 0
-      jewels += Jewel.where(game_id: card.game.id, user_id: id, jewel_type: jewel_type).first(cost)
+      jewel_chips += JewelChip.where(game_id: card.game.id, user_id: id, jewel_type: jewel_type).first(cost)
     end
-    jewels
+    jewel_chips
   end
+
+  def purchase_validation(card, jewel_ids)
+    able = true
+    jewel_group_count = JewelChip.where(id: jewel_ids).group(:jewel_type).count.symbolize_keys
+    gold_count = jewel_group_count[:gold] || 0
+    actual_cost(card).each do |jewel_type, cost|
+      return unless able
+      exist_count = (jewel_group_count[jewel_type] || 0)
+      if cost > exist_count + gold_count
+        able = false
+      else
+        lack_count = cost - exist_count
+        gold_count -= lack_count if lack_count > 0
+      end
+    end
+    able
+  end
+
+  def total_point(game)
+    total_cards(game).inject(0){|sum, card| sum + card.point} +
+    game.nobles.where(user_id: id).inject(0){|sum, noble| sum + noble.point}
+  end
+
+  def total_cards(game)
+    game.cards.where(user_id: id, reserved: false)
+  end
+
 end

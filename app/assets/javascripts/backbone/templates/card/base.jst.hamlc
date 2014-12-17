@@ -1,5 +1,10 @@
 .card-padder
   .card
+    .hover-view
+      .purchase.center-center
+        %span.fa.fa-money
+      .reserve.center-center
+        %span.fa.fa-heart
     .header
       - if @model.get("point") > 0
         .point-padder

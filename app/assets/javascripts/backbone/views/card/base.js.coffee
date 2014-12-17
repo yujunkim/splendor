@@ -3,10 +3,10 @@ BSplendor.Views.Card = {}
 class BSplendor.Views.Card.Base extends Backbone.View
 
   events:
-    'click': 'clicked'
-    'contextmenu': 'contextmenued'
-    'mouseenter': 'mouseentered'
-    'mouseleave': 'mouseleaved'
+    'click .purchase': 'purchase'
+    'click .reserve': 'reserve'
+    'click': 'cancel'
+    "mousemove": "mousemoved"
 
   className: 'card-view'
 
@@ -14,27 +14,36 @@ class BSplendor.Views.Card.Base extends Backbone.View
 
   initialize: () ->
     @model.on("change", @render, @)
+    @model.on("purchasable-user-change", @changePurchasableUserClass, @)
 
   render: ->
     @$el.addClass("card-view-#{@collection.indexOf(@model)}") if @collection?
     @$el.html @template @
     @$el.find(".card").addClass("revealed") if @model.get("revealed")
-    if @model.get("coverColor")
-      @$el.find(".card").css "border-color": @model.get("coverColor")
+    @changePurchasableUserClass()
 
-  clicked: =>
-    @model.clicked()
+  changePurchasableUserClass: =>
+    @$el.find(".card").removeClass (idx, cls) ->
+      cls.match("purchasable-user")
+    @model.purchasableUser.forEach (user) =>
+      @$el.find(".card").addClass("purchasable-user-#{user.get("id")}")
+      if user.get("me")
+        @$el.find(".card").addClass("purchasable-user-me")
 
-  contextmenued: =>
-    @model.contextmenued()
+  cancel: (e) =>
+    e.stopPropagation()
+    @model.cancel()
 
-  mouseentered: (e) =>
-    if @collection && @collection.type == "pack"
-      game.zoomField.visualize("packCardList", @collection)
-    else
-      game.zoomField.visualize("card", @model)
+  purchase: (e) =>
+    e.stopPropagation()
+    @model.purchase()
 
-  mouseleaved: (e) =>
-    game.zoomField.reset()
+  reserve: (e) =>
+    e.stopPropagation()
+    @model.reserve()
+
+  mousemoved: (e) ->
+    e.stopPropagation() unless @model.collection? && @model.collection.user?
+    game.trigger("gameChildHovered", e, @)
 
 

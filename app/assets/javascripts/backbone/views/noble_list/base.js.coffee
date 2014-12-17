@@ -11,6 +11,7 @@ class BSplendor.Views.NobleList.Base extends Backbone.View
     @collection.on 'add', @addOne, @
 
   render: ->
+    @$el.children().remove()
     @collection.forEach(@addOne, @)
     this
 

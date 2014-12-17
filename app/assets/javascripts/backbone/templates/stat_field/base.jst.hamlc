@@ -1,0 +1,3 @@
+Winner
+%br
+= @model.winner().get("name")

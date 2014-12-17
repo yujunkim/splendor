@@ -1,5 +1,4 @@
-%li.user
-  %a{href: "#"}
-    .thumbnail{style: "background-color: #{@get("color")}"}
-    %span.name
-      = @get("name")
+%li.list-group-item.user{"data-id" => @get("id")}
+  %span.name
+    %i.fa.fa-square.fa-fw{style: "color: #{@get("color")}"}
+    = @get("name")

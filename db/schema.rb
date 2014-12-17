@@ -40,11 +40,13 @@ ActiveRecord::Schema.define(version: 20141117054256) do
 
   create_table "games", force: true do |t|
     t.integer  "current_turn_user_id"
+    t.integer  "winner_id"
+    t.string   "order_user_ids"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "jewels", force: true do |t|
+  create_table "jewel_chips", force: true do |t|
     t.integer  "user_id"
     t.integer  "game_id"
     t.string   "jewel_type"

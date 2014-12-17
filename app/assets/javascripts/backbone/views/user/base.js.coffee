@@ -3,8 +3,7 @@ BSplendor.Views.User = {}
 class BSplendor.Views.User.Base extends Backbone.View
 
   events:
-    'mouseenter': 'mouseentered'
-    'mouseleave': 'mouseleaved'
+    'mousemove': 'mousemoved'
 
   className: 'user'
 
@@ -50,22 +49,10 @@ class BSplendor.Views.User.Base extends Backbone.View
       @$el.addClass("current-turn")
     else
       @$el.removeClass("current-turn")
+    if @model.get("winner")
+      @$el.addClass("winner")
     @addCollections(@$el)
 
-  mouseentered: (e) =>
+  mousemoved: (e) ->
     e.stopPropagation()
-    @backgroundFocused()
-    game.zoomField.visualize("user", @model)
-
-  mouseleaved: (e) =>
-    e.stopPropagation()
-    @backgroundReset()
-    game.zoomField.reset()
-
-  backgroundFocused: () =>
-    game.highlightPurchasableCards(@model, @model.get("color"))
-    @$el.find(".background").css("background-color": @model.get("color"), "opacity": "0.3")
-
-  backgroundReset: () =>
-    game.resetHighlightPurchasableCards(@model)
-    @$el.find(".background").css("background-color": "", "opacity": "")
+    game.trigger("gameChildHovered", e, @)

@@ -1,0 +1,32 @@
+#chat
+  .panel.panel-primary
+    .panel-heading
+      %span.fa.fa-send
+      .btn-group.pull-right.operation-dropdown
+        %button.btn.btn-default.btn-xs.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
+          %span.fa.fa-cog.fa-spin
+        %ul.dropdown-menu.slidedown
+          %li#recolor
+            %a{href: "#"}
+              %i.fa.fa-picture-o.fa-fw
+              Recolor
+          %li#robotify
+            %a{href: "#"}
+              %i.fa.fa-android.fa-fw
+              Robotify
+          %li#rename
+            %a{href: "#"}
+              %i.fa.fa-pencil.fa-fw
+              Rename
+      .btn-group.pull-right.operation-dropdown
+        %button.btn.btn-default.btn-xs.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
+          %span.fa.fa-users
+        %ul.user-list.dropdown-menu.slidedown
+          = @usersTemplate()
+    .panel-body
+    .panel-footer
+      .input-group
+        %input#message.form-control.input-sm{:placeholder => "Type your message here...", :type => "text"}
+        %span.input-group-btn
+          %button#send.btn.btn-warning.btn-sm
+            Send
