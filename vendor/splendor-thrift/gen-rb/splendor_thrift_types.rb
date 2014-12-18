@@ -183,13 +183,15 @@ module SplendorThrift
   class ActionResult
     include ::Thrift::Struct, ::Thrift::Struct_Union
     ACTIONTYPE = 1
-    PURCHASEDCARD = 2
-    RESERVEDCARD = 3
+    CARDID = 2
+    RECEIVEJEWELCHIPMAP = 3
+    RETURNJEWELCHIPMAP = 4
 
     FIELDS = {
       ACTIONTYPE => {:type => ::Thrift::Types::I32, :name => 'actionType', :enum_class => ::SplendorThrift::ActionType},
-      PURCHASEDCARD => {:type => ::Thrift::Types::STRUCT, :name => 'purchasedCard', :class => ::SplendorThrift::Card, :optional => true},
-      RESERVEDCARD => {:type => ::Thrift::Types::STRUCT, :name => 'reservedCard', :class => ::SplendorThrift::Card, :optional => true}
+      CARDID => {:type => ::Thrift::Types::I32, :name => 'cardId', :optional => true},
+      RECEIVEJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'receiveJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}, :optional => true},
+      RETURNJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'returnJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}, :optional => true}
     }
 
     def struct_fields; FIELDS; end

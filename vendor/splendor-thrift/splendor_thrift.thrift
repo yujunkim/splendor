@@ -69,12 +69,13 @@ struct Game {
 
 struct ActionResult {
   1: required ActionType actionType;
-  2: optional Card purchasedCard;
-  3: optional Card reservedCard;
+  2: optional id cardId;
+  3: optional map<JewelType, i32> receiveJewelChipMap;
+  4: optional map<JewelType, i32> returnJewelChipMap;
 }
 
 service Player
 {
   void hi()
-  ActionResult play(1:Game game, 2:id userId)
+  ActionResult play(1:Game game)
 }

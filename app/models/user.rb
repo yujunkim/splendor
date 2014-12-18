@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   before_create :fill_auth_token
   before_create :fill_sample_name
   before_create :fill_sample_color
+  before_create :fill_default_home
 
   def fill_auth_token
     self.auth_token = Forgery('basic').encrypt
@@ -23,6 +24,10 @@ class User < ActiveRecord::Base
     self.color = Forgery('basic').color.underscore
   end
 
+  def fill_default_home
+    self.home = "127.0.0.1:9090"
+  end
+
   def purchase(card)
     card.user_id = self.id
     card.reserved = false
@@ -35,14 +40,30 @@ class User < ActiveRecord::Base
     card.save
   end
 
-  def receive(jewel_chip)
-    jewel_chip.user_id = self.id
-    jewel_chip.save
+  def receive(game, jewel_chip_map)
+    return [] if jewel_chip_map.blank?
+    result = []
+    jewel_chip_map.each do |jewel_type, count|
+      game.jewel_chips.where(jewel_type: jewel_type, user_id: nil).first(count).each do |jewel_chip|
+        jewel_chip.user_id = self.id
+        jewel_chip.save
+        result << jewel_chip
+      end
+    end
+    result
   end
 
-  def return(jewel_chip)
-    jewel_chip.user_id = nil
-    jewel_chip.save
+  def return(game, jewel_chip_map)
+    return [] if jewel_chip_map.blank?
+    result = []
+    jewel_chip_map.each do |jewel_type, count|
+      game.jewel_chips.where(jewel_type: jewel_type, user_id: id).first(count).each do |jewel_chip|
+        jewel_chip.user_id = nil
+        jewel_chip.save
+        result << jewel_chip
+      end
+    end
+    result
   end
 
   def hire(noble)
@@ -97,13 +118,12 @@ class User < ActiveRecord::Base
     jewel_chips
   end
 
-  def purchase_validation(card, jewel_ids)
+  def purchase_validation(card, jewel_chip_map)
     able = true
-    jewel_group_count = JewelChip.where(id: jewel_ids).group(:jewel_type).count.symbolize_keys
-    gold_count = jewel_group_count[:gold] || 0
+    gold_count = jewel_chip_map[:gold].to_i
     actual_cost(card).each do |jewel_type, cost|
       return unless able
-      exist_count = (jewel_group_count[jewel_type] || 0)
+      exist_count = jewel_chip_map[jewel_type].to_i
       if cost > exist_count + gold_count
         able = false
       else

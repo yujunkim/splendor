@@ -56,7 +56,10 @@ class BSplendor.Views.Operator.Base extends Backbone.View
     splendorController.dispatcher.trigger 'setting', color: true
 
   robotify: ->
-    splendorController.dispatcher.trigger 'setting', robotify: !Splendor.Me.get("robot")
+    home = "127.0.0.1:9090"
+    if !Splendor.Me.get("robot")
+      home = prompt("set robot's home", "127.0.0.1:9090")
+    splendorController.dispatcher.trigger 'setting', robotify: !Splendor.Me.get("robot"), home: home
 
   sendMessage: (e) =>
     e.preventDefault()

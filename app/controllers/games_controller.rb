@@ -13,10 +13,8 @@ class GamesController < ApplicationController
     game = Game.find_by_id(params[:id])
     return unless game.current_turn_user.robot
     robot_user = game.current_turn_user
-    data = params[:d] || {}
-    type = params[:type]
 
-    game.action(robot_user, {type: type, d: data})
+    game.action(robot_user, params)
 
     render nothing: true
   end

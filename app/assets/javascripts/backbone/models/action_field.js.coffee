@@ -101,20 +101,23 @@ class BSplendor.Models.ActionField extends Backbone.Model
   getIds: (collection) =>
     _.map collection.models, (model) -> model.get("id")
 
+  getJewelChipMap: (collection) =>
+    map = {}
+    collection.models.forEach (model) ->
+      map[model.get("jewelType")] ||= 0
+      map[model.get("jewelType")] += 1
+    map
+
   serialize: =>
     {
-      card_id: @getIds(@cardList)[0]
-      receive_jewel_chip_ids: @getIds(@receiveJewelChipList)
-      return_jewel_chip_ids: @getIds(@returnJewelChipList)
+      actionType: @get("type")
+      cardId: @getIds(@cardList)[0]
+      receiveJewelChipMap: @getJewelChipMap(@receiveJewelChipList)
+      returnJewelChipMap: @getJewelChipMap(@returnJewelChipList)
     }
 
   action: =>
-    switch @get("type")
-      when "purchaseCard"
-        splendorController.action("purchase_card", @serialize())
-      when "reserveCard"
-        splendorController.action("reserve_card", @serialize())
-      when "receiveJewelChip"
-        splendorController.action("receive_jewel_chip", @serialize())
+    console.log @serialize()
+    splendorController.action(@serialize())
     @reset()
 

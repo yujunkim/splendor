@@ -65,12 +65,8 @@ class Splendor.Controller
     console.log message
     game.gameOver(message.winner)
 
-  action: (type, data) =>
-    @dispatcher.trigger "action", {
-      game_id: game.id,
-      type: type,
-      d: data
-    }
+  action: (data) =>
+    @dispatcher.trigger "action", $.extend(data, gameId: game.id)
 
   newMessage: (message) =>
     window.operator.newMessage(message) if window.operator

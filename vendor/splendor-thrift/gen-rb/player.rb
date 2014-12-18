@@ -26,13 +26,13 @@ module SplendorThrift
         return
       end
 
-      def play(game, userId)
-        send_play(game, userId)
+      def play(game)
+        send_play(game)
         return recv_play()
       end
 
-      def send_play(game, userId)
-        send_message('play', Play_args, :game => game, :userId => userId)
+      def send_play(game)
+        send_message('play', Play_args, :game => game)
       end
 
       def recv_play()
@@ -56,7 +56,7 @@ module SplendorThrift
       def process_play(seqid, iprot, oprot)
         args = read_args(iprot, Play_args)
         result = Play_result.new()
-        result.success = @handler.play(args.game, args.userId)
+        result.success = @handler.play(args.game)
         write_result(result, oprot, 'play', seqid)
       end
 
@@ -97,11 +97,9 @@ module SplendorThrift
     class Play_args
       include ::Thrift::Struct, ::Thrift::Struct_Union
       GAME = 1
-      USERID = 2
 
       FIELDS = {
-        GAME => {:type => ::Thrift::Types::STRUCT, :name => 'game', :class => ::SplendorThrift::Game},
-        USERID => {:type => ::Thrift::Types::I32, :name => 'userId'}
+        GAME => {:type => ::Thrift::Types::STRUCT, :name => 'game', :class => ::SplendorThrift::Game}
       }
 
       def struct_fields; FIELDS; end

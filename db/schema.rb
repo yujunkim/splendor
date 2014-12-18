@@ -71,6 +71,7 @@ ActiveRecord::Schema.define(version: 20141117054256) do
     t.string   "auth_token"
     t.string   "name"
     t.string   "color"
+    t.string   "home"
     t.boolean  "robot",      default: false
     t.datetime "created_at"
     t.datetime "updated_at"

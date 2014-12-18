@@ -13,6 +13,7 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   def setting
     if message.has_key?(:robotify)
       current_user.robot = !!message[:robotify]
+      current_user.home = message[:home]
       current_user.save
       update_users
     elsif message.has_key?(:username)
@@ -64,16 +65,13 @@ class SplendorWebsocketController < WebsocketRails::BaseController
     user_msg :new_message, message.dup
   end
 
-  def game
-    @game ||= Game.find(message[:game_id])
-  end
-
   # message
   # {
   #   type: "purchase_card", "reserve_card", "receive_jewel_chip"
   #   d: ...
   # }
   def action
+    game = Game.find(message[:gameId])
     game.action(current_user, message)
   end
 

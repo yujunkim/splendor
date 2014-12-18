@@ -4,12 +4,39 @@ class Robot
 
   def self.play(game_id)
     fork do
+      game = Game.find_by_id(game_id)
+      return unless game
       sleep(0.5)
-      action_data = open("http://localhost:5000/games/#{game_id}/default_robot_play_data").read
+      robot_user = game.current_turn_user
+      begin
+        client = ThriftClient.new(SplendorThrift::Player::Client, robot_user.home , retries: 2)
+        action_result = client.play(
+          GameSerializer.new(game, root: false, scope: robot_user).as_thrift
+        )
+      rescue ThriftClient::NoServersAvailable
+        action_result = $thrift_client.play(
+          GameSerializer.new(game, root: false, scope: robot_user).as_thrift
+        )
+      end
 
-      if action_data
+      params = action_result.as_json
+
+      params["actionType"] = ActionType[params["actionType"]].camelize(:lower)
+
+      if params["receiveJewelChipMap"]
+        params["receiveJewelChipMap"] = Hash[params["receiveJewelChipMap"].map do |jewel_type, cost|
+          [JewelType[jewel_type.to_i], cost.to_i]
+        end]
+      end
+
+      if params["returnJewelChipMap"]
+        params["returnJewelChipMap"] = Hash[params["returnJewelChipMap"].map do |jewel_type, cost|
+          [JewelType[jewel_type.to_i], cost.to_i]
+        end]
+      end
+
+      if action_result
         uri = URI.parse("http://localhost:5000/games/#{game_id}/robot_play")
-        params = JSON.parse(action_data)
         uri.query = params.to_query
         uri.open
       end

@@ -69,28 +69,34 @@ class Game < ActiveRecord::Base
   end
 
   def action(user, options)
-    return unless ["purchase_card", "reserve_card", "receive_jewel_chip"].include?(options[:type])
-    if self.validation(options[:type], user, options[:d])
-      action_opts= self.send(options[:type], user, options[:d])
-      self.after_action(user, options[:type], action_opts)
+    method = options[:actionType].underscore
+    return unless ["purchase_card", "reserve_card", "receive_jewel_chip"].include?(method)
+    if self.validation(method, user, options)
+      action_opts = self.send(method.underscore, user, options)
+      self.after_action(user, method, action_opts)
     else
       binding.pry
     end
   end
 
   def validation(type, user, data)
+    def jewel_chip_count(jewel_chip_map)
+      return 0 if jewel_chip_map.blank?
+      jewel_chip_map.map{|jewel_chip, count| count.to_i}.inject{|sum,x| sum + x }
+    end
+
     able = true
     case type
     when "purchase_card"
-      card = Card.find_by_id(data[:card_id])
-      able &&= user.purchase_validation(card, data[:return_jewel_chip_ids])
+      card = Card.find_by_id(data[:cardId])
+      able &&= user.purchase_validation(card, data[:returnJewelChipMap])
     when "reserve_card"
-      able &&= user.jewel_chips.where(game_id: id).count + (data[:receive_jewel_chip_ids] || []).count <= 10
+      able &&= user.jewel_chips.where(game_id: id).count + jewel_chip_count(data[:receiveJewelChipMap]) <= 10
     when "receive_jewel_chip"
       able &&= (
         user.jewel_chips.where(game_id: id).count +
-        (data[:receive_jewel_chip_ids] || []).count -
-        (data[:return_jewel_chip_ids] || []).count <= 10
+        jewel_chip_count(data[:receiveJewelChipMap]) -
+        jewel_chip_count(data[:returnJewelChipMap]) <= 10
       )
     else
       able = false
@@ -151,14 +157,13 @@ class Game < ActiveRecord::Base
   end
 
   def purchase_card(user, data)
-    purchased_card = Card.find_by_id(data[:card_id])
+    purchased_card = Card.find_by_id(data[:cardId])
     user.purchase(purchased_card)
     hired_noble = user.hire_noble(self)
 
     revealed_card = purchased_card.game.pickup_unrevealed_card(purchased_card.card_grade)
 
-    returned_jewel_chips = JewelChip.where(id: data[:return_jewel_chip_ids])
-    returned_jewel_chips.each { |jewel| user.return(jewel) }
+    returned_jewel_chips = user.return(self, data[:returnJewelChipMap])
 
     {
       purchased_card: purchased_card,
@@ -169,13 +174,12 @@ class Game < ActiveRecord::Base
   end
 
   def reserve_card(user, data)
-    reserved_card = Card.find_by_id(data[:card_id])
+    reserved_card = Card.find_by_id(data[:cardId])
     user.reserve(reserved_card)
 
     revealed_card = reserved_card.game.pickup_unrevealed_card(reserved_card.card_grade)
 
-    received_jewel_chips = JewelChip.where(id: data[:receive_jewel_chip_ids])
-    received_jewel_chips.each { |jewel_chip| user.receive(jewel_chip) }
+    received_jewel_chips = user.receive(self, data[:receiveJewelChipMap])
 
     {
       reserved_card: reserved_card,
@@ -185,11 +189,8 @@ class Game < ActiveRecord::Base
   end
 
   def receive_jewel_chip(user, data)
-    received_jewel_chips = JewelChip.where(id: data[:receive_jewel_chip_ids])
-    received_jewel_chips.each { |jewel_chip| user.receive(jewel_chip) }
-
-    returned_jewel_chips = JewelChip.where(id: data[:return_jewel_chip_ids])
-    returned_jewel_chips.each { |jewel_chip| user.return(jewel_chip) }
+    received_jewel_chips = user.receive(self, data[:receiveJewelChipMap])
+    returned_jewel_chips = user.return(self, data[:returnJewelChipMap])
 
     {
       received_jewel_chips: received_jewel_chips,
