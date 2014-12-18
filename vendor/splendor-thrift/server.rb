@@ -103,12 +103,14 @@ class PlayerHandler
 
 end
 
-handler = PlayerHandler.new()
-processor = SplendorThrift::Player::Processor.new(handler)
-transport = Thrift::ServerSocket.new("localhost", 9090)
-transportFactory = Thrift::FramedTransportFactory.new()
-server = Thrift::SimpleServer.new(processor, transport, transportFactory)
+def server_start
+  handler = PlayerHandler.new()
+  processor = SplendorThrift::Player::Processor.new(handler)
+  transport = Thrift::ServerSocket.new("localhost", 9090)
+  transportFactory = Thrift::FramedTransportFactory.new()
+  server = Thrift::SimpleServer.new(processor, transport, transportFactory)
 
-puts "Starting the server..."
-server.serve()
-puts "done."
+  puts "Starting the server..."
+  server.serve()
+  puts "done."
+end
