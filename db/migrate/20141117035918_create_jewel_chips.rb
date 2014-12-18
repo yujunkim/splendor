@@ -7,5 +7,8 @@ class CreateJewelChips < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :jewel_chips, :user_id
+    add_index :jewel_chips, :game_id
+    add_index :jewel_chips, :jewel_type
   end
 end

@@ -1,6 +1,6 @@
 class Game < ActiveRecord::Base
   has_many :game_user_association
-  has_many :users, through: :game_user_association
+  has_many :users, -> { order(order: :asc) }, through: :game_user_association
   belongs_to :current_turn_user, class_name: :User
   belongs_to :winner, class_name: :User
   has_many :cards
@@ -30,10 +30,12 @@ class Game < ActiveRecord::Base
       users << User.create(robot: true)
     end
     g = Game.create
-    g.users = users
-    g.order_user_ids = g.users.shuffle.map(&:id).join(",")
+    user_ids = users.shuffle.map(&:id)
+    user_ids.each_with_index do |user_id, idx|
+      GameUserAssociation.create(game_id: g.id, user_id: user_id, order: idx)
+    end
 
-    g.current_turn_user_id = g.order_user_ids.split(",").first
+    g.current_turn_user_id = user_ids.first
     g.save
 
     Card.generate(g)

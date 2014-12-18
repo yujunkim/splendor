@@ -16,5 +16,11 @@ class CreateCards < ActiveRecord::Migration
 
       t.timestamps
     end
+
+    add_index :cards, :user_id
+    add_index :cards, :game_id
+    add_index :cards, :jewel_type
+    add_index :cards, :reserved
+    add_index :cards, :revealed
   end
 end

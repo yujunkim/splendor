@@ -7,5 +7,8 @@ class CreateGameUserAssociations < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :game_user_associations, :user_id
+    add_index :game_user_associations, :game_id
+    add_index :game_user_associations, :order
   end
 end

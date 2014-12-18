@@ -12,5 +12,7 @@ class CreateNobles < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :nobles, :user_id
+    add_index :nobles, :game_id
   end
 end

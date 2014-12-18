@@ -7,10 +7,11 @@ require 'player'
 
 $thrift_client = ThriftClient.new(SplendorThrift::Player::Client, '127.0.0.1:9090', retries: 2)
 
-
-# do NOT use db access or others without thrift data
-fork do
-  $:.push(Rails.root + "vendor" + "splendor-thrift")
-  require 'server'
-  server_start
+if Rails.const_defined? "Server"
+  # do NOT use db access or others without thrift data
+  fork do
+    $:.push(Rails.root + "vendor" + "splendor-thrift")
+    require 'server'
+    thrift_server_start
+  end
 end
