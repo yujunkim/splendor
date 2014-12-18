@@ -43,3 +43,4 @@ gem 'active_model_serializers', "0.8.1"
 gem 'forgery'
 gem 'thrift'
 gem 'thrift_client'
+gem 'pg'

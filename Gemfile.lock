@@ -87,6 +87,7 @@ GEM
     minitest (5.4.3)
     multi_json (1.10.1)
     mysql2 (0.3.17)
+    pg (0.17.1)
     polyglot (0.3.5)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -195,6 +196,7 @@ DEPENDENCIES
   jquery-rails
   less-rails
   mysql2
+  pg
   pry-rails
   rails (= 4.1.2)
   rails-backbone

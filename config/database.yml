@@ -7,3 +7,10 @@ development:
   host: localhost
   reconnect: true
 
+production:
+  adapter: postgresql
+  host: ec2-54-83-5-151.compute-1.amazonaws.com
+  username: cdjxodxejubgnp
+  database: app-dev
+  port: 5432
+  password: KqlWS-hmp0jWLrMq261o-5EIcQ
