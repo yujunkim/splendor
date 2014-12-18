@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   root to: "games#index"
   resources :games, only: [:index, :show] do
     member do
-      get :default_robot_play_data
+      get :run
       get :robot_play
     end
   end

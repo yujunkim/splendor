@@ -8,6 +8,8 @@ class Game < ActiveRecord::Base
   has_many :jewelChips
   has_many :nobles
 
+  attr_accessor :request
+
   # {
   #   user_ids: [],
   #   robot_count: 0
@@ -16,7 +18,6 @@ class Game < ActiveRecord::Base
     def self.generate_validation(options)
       able = true
       able &&= options[:user_ids] && options[:robot_count]
-      able &&= options[:user_ids].count > 0
       participants_count = options[:user_ids].count + options[:robot_count]
       able &&= participants_count >= 2
       able &&= participants_count <= 4
@@ -24,7 +25,7 @@ class Game < ActiveRecord::Base
     end
 
     return unless generate_validation(options)
-    users = User.where(id: options[:user_ids]).to_a
+    users = User.where(id: (options[:user_ids] || [])).to_a
     (options[:robot_count] || 0).times do |i|
       users << User.create(robot: true)
     end
@@ -39,6 +40,19 @@ class Game < ActiveRecord::Base
     JewelChip.generate(g)
     Noble.generate(g)
     g
+  end
+
+  def run
+    if Splendor::Application::GAME_RUNNER[self.id]
+      Splendor::Application::GAME_RUNNER[self.id] -= 1
+    else
+      Splendor::Application::GAME_RUNNER[self.id] = 0
+    end
+
+    if Splendor::Application::GAME_RUNNER[self.id] == 0
+      Splendor::Application::GAME_RUNNER[self.id] += 1
+      Robot.play(self)
+    end
   end
 
   def pickup_unrevealed_card(grade)
@@ -74,8 +88,6 @@ class Game < ActiveRecord::Base
     if self.validation(method, user, options)
       action_opts = self.send(method.underscore, user, options)
       self.after_action(user, method, action_opts)
-    else
-      binding.pry
     end
   end
 
@@ -86,6 +98,7 @@ class Game < ActiveRecord::Base
     end
 
     able = true
+    able &&= self.current_turn_user_id == user.id
     case type
     when "purchase_card"
       card = Card.find_by_id(data[:cardId])
@@ -119,7 +132,7 @@ class Game < ActiveRecord::Base
           winner: UserSerializer.new(winner, root: false, scope: connection.user)
       end
     else
-      Robot.play(id) if self.current_turn_user.robot
+      run if self.current_turn_user.robot
     end
   end
 

@@ -53,7 +53,8 @@ class SplendorWebsocketController < WebsocketRails::BaseController
         )
       end
     end
-    Robot.play(game.id) if game.current_turn_user.robot
+    game.request = request
+    game.run if game.current_turn_user.robot
   end
 
   def restart_game
@@ -72,6 +73,7 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   # }
   def action
     game = Game.find(message[:gameId])
+    game.request = request
     game.action(current_user, message)
   end
 
