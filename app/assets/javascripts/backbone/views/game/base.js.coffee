@@ -4,6 +4,7 @@ class BSplendor.Views.Game.Base extends Backbone.View
 
   events:
     "mousemove": "mousemoved"
+    "click #run-robot": "robotRun"
 
   className: 'game-view'
 
@@ -51,3 +52,11 @@ class BSplendor.Views.Game.Base extends Backbone.View
         model: @model.statField
       view.render()
       @$el.find(".game").append view.el
+
+  robotRun: ->
+    if @model.get("id")
+      $.ajax
+        url: "/games/#{@model.get("id")}/run",
+        success: ->
+
+

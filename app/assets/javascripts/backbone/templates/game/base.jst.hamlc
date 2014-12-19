@@ -1,2 +1,5 @@
 .game-padder
   .game
+    #run-robot.font-size-2
+      %i.fa.fa-android
+      %i.fa.fa-play
