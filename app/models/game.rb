@@ -1,6 +1,6 @@
 class Game < ActiveRecord::Base
-  has_many :game_user_association
-  has_many :users, -> { order(order: :asc) }, through: :game_user_association
+  has_many :game_user_associations
+  has_many :users, -> { order('game_user_associations.order ASC') }, through: :game_user_associations
   belongs_to :current_turn_user, class_name: :User
   belongs_to :winner, class_name: :User
   has_many :cards

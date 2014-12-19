@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
-  has_many :game_user_association
-  has_many :games, through: :game_user_association
+  has_many :game_user_associations
+  has_many :games, through: :game_user_associations
   has_many :my_turn_games, class_name: :Game, foreign_key: :next_turn_user_id
   has_many :cards
   has_many :jewel_chips
