@@ -44,3 +44,4 @@ gem 'forgery'
 gem 'thrift'
 gem 'thrift_client'
 gem 'pg'
+gem 'rails_12factor', group: :production
