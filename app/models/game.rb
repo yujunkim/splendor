@@ -67,7 +67,7 @@ class Game < ActiveRecord::Base
   end
 
   def next_turn
-    user_ids = order_user_ids.split(",").map(&:to_i)
+    user_ids = users.map(&:id)
     idx = user_ids.index(current_turn_user_id)
     idx += 1
     idx = 0 if idx == user_ids.length
@@ -139,7 +139,7 @@ class Game < ActiveRecord::Base
   end
 
   def game_over(user)
-    return false if user.id != order_user_ids.split(",").last.to_i
+    return false if user.id != users.map(&:id).last
     self.users.map do |u|
       u.total_point(self) > 15
     end.uniq != [false]

@@ -9,7 +9,7 @@ class GameSerializer < Thriftify
   end
 
   def orderUserIds
-    object.order_user_ids.split(",").map(&:to_i) rescue []
+    object.users.map(&:id) rescue []
   end
 
   def winnerId
