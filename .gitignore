@@ -30,8 +30,6 @@ bak
 /db/sphinx
 /log/*.pid
 /config/*.sphinx.conf
-# Ignore bin stubs.
-/bin
 .DS_Store
 /public/images/discover
 /public/feed*.json
