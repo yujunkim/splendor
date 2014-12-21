@@ -8,6 +8,7 @@ WebsocketRails::EventMap.describe do
     :new_message,
     :client_connected,
     :client_disconnected,
+    :channel_subscribed,
     :action
   ].each{|method| subscribe method, to: SplendorWebsocketController, with_method: method}
 end

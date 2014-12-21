@@ -167,6 +167,16 @@ class BSplendor.Models.Game extends Backbone.Model
         user.set(currentTurn: true)
       else
         user.set(currentTurn: undefined)
+    if @userTurn(@me)
+      @alertTimeout = setTimeout( ->
+        $("body").addClass("alert-opacity")
+      , 5000)
+
+  clearAlertTimeout: ()=>
+    if @alertTimeout
+      clearTimeout(@alertTimeout)
+      @alertTimeout = undefined
+      $("body").removeClass("alert-opacity")
 
   setCardPurchasable: () =>
     _.each @users, (user, userId) =>
@@ -200,6 +210,7 @@ class BSplendor.Models.Game extends Backbone.Model
     el.addClass("hovered")
 
   childElementHovered: (event, view) =>
+    @clearAlertTimeout()
     alreadyProcessedEvent = @recentEvent? && @recentEvent.originalEvent == event.originalEvent
     if alreadyProcessedEvent
       @hoverWith(view.$el)

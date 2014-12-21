@@ -48,6 +48,7 @@ class Splendor.Controller
 
   gameStarted: (options)=>
     @channel = @dispatcher.subscribe("game#{options.game.id}")
+    @dispatcher.trigger "channel_subscribed", "game#{options.game.id}"
     @dispatcher.bind 'action_performed', @actionPerformed
     @dispatcher.bind 'game_over', @gameOver
 
@@ -62,7 +63,6 @@ class Splendor.Controller
     game.actionPerformed(message.type, message.d)
 
   gameOver: (message)->
-    console.log message
     game.gameOver(message.winner)
 
   action: (data) =>

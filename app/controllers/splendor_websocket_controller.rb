@@ -27,16 +27,24 @@ class SplendorWebsocketController < WebsocketRails::BaseController
     end
   end
 
-  def update_users(options = {})
+  def update_users
+    playing_user_id_hash = Hash[WebsocketRails.channel_tokens.keys.map do |key|
+      user_ids = WebsocketRails[key].subscribers.map{|x| x.user.id}
+      [key, user_ids]
+    end]
+    playing_user_ids = playing_user_id_hash.values.flatten
     WebsocketRails.users.each do |connection|
       users = WebsocketRails.users.map do |c|
-        next if options[:except] && options[:except].id == c.user.id
-        UserSerializer.new(c.user.reload, scope: connection.user.reload, root: false)
+        UserSerializer.new(c.user.reload, scope: connection.user.reload, root: false, playing: playing_user_ids.include?(c.user.id))
       end
       users.compact!
 
       connection.send_message :update_users, users
     end
+  end
+
+  def channel_subscribed
+    update_users
   end
 
   # {

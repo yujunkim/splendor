@@ -118,6 +118,7 @@ class BSplendor.Models.ActionField extends Backbone.Model
 
   action: =>
     console.log @serialize()
+    game.clearAlertTimeout()
     splendorController.action(@serialize())
     @reset()
 

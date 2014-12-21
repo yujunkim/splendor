@@ -9,8 +9,9 @@ class BSplendor.Collections.ChatList extends Backbone.Collection
 
   updateChatUsers: ()=>
     @models.forEach (model) ->
-      uid = model.get("user").id
+      uid = model.get("userId")
       updatedUser = splendorController.getUser(uid)
-      model.set(user: updatedUser)
-      model.trigger('user.updated')
+      if updatedUser
+        model.set(user: updatedUser)
+        model.trigger('user.updated')
 

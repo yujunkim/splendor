@@ -17,3 +17,10 @@ class BSplendor.Models.Chat extends Backbone.Model
       @get("user").get("name")
     else
       @get("userName")
+
+  userId: () ->
+    if @get("user")
+      @set(userId: @get("user").get("id"))
+      @get("user").get("id")
+    else
+      @get("userId")

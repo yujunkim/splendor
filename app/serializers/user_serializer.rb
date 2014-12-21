@@ -4,7 +4,8 @@ class UserSerializer < Thriftify
              :color,
              :robot,
              :lastGameId,
-             :me
+             :me,
+             :playing
 
   def me
     !!(options[:scope] && options[:scope].id == id)
@@ -12,5 +13,9 @@ class UserSerializer < Thriftify
 
   def lastGameId
     object.games.last.try(:id)
+  end
+
+  def playing
+    !!options[:playing]
   end
 end

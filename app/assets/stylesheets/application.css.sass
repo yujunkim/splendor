@@ -65,6 +65,19 @@ html, body
   width: 100%
   height: 100%
 
+body
+  &.alert-opacity
+    -webkit-animation: alert 1s infinite
+    animation: alert 1s infinite
+
+@-webkit-keyframes alert
+  0%
+    opacity: 1
+  50%
+    opacity: 0.1
+  100%
+    opacity: 1
+
 .operator
   width: 100%
   height: 100%
@@ -143,6 +156,8 @@ html, body
               .list-group-item
                 cursor: pointer
                 padding: 5%
+                &.playing
+                  pointer-events: none
                 &:hover
                   color: coral
           .list-arrows
@@ -719,6 +734,11 @@ html, body
     cursor: pointer
     &:hover
       color: coral
+  &.game-3users
+    .user.left
+      top: 25%
+    .zoom-field
+      top: 70%
 
 
 .game-view

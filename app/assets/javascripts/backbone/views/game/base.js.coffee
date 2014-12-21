@@ -35,15 +35,26 @@ class BSplendor.Views.Game.Base extends Backbone.View
       view.render()
       game.append view.el
 
-    i = 0
+    orderUserIds = @model.get("orderUserIds")
+    game.addClass("game-#{orderUserIds.length}users")
+
+    userPositions = switch orderUserIds.length
+      when 2 then ["bottom", "top"]
+      when 3 then ["bottom", "left", "right"]
+      when 4 then ["bottom", "left", "top", "right"]
+
+    myId = @model.me.get("id")
+    myOrder = @model.get("orderUserIds").indexOf(myId)
     _.each @model.users, (user, type) =>
+      order = orderUserIds.indexOf(user.get("id"))
+      relativeOrder = order - myOrder
+      relativeOrder += orderUserIds.length if relativeOrder < 0
       view = BSplendor.Views.User.Base
       userView = new view
         model: user
-        position: ["top", "right", "left"][i]
+        position: userPositions[relativeOrder]
       userView.render()
       game.append userView.el
-      i += 1 unless user.get('me')
     @addStatField()
 
   addStatField: ->
