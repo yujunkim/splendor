@@ -126,6 +126,7 @@ class BSplendor.Models.Game extends Backbone.Model
 
   actionPerformed: (type, data) =>
     @resetCardPurchasable()
+    @clearAlertTimeout()
     user = @users[data.userId]
 
     if data.purchasedCard && purchasedCard = @dic.card[data.purchasedCard.id]

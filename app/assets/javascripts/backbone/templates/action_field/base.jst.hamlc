@@ -1,4 +1,4 @@
-.footer.btn-group
+.footer
   %button#action.btn.btn-primary.btn-sm{class: "#{"disabled" unless @model.get("enable")}"}
-    action
+    %i.fa.fa-play
 

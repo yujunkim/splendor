@@ -630,9 +630,9 @@ body
     left: 81%
     .card-list
       position: absolute
-      width: 32.75%
-      left: 7%
-      top: 4%
+      width: 43%
+      left: 52%
+      top: 20%
       .card-view.hovered
         .card-padder
           .card
@@ -642,22 +642,20 @@ body
       position: absolute
       //width: 23.390%
       width: 35%
-      left: 60%
+      left: 8%
       top: 20%
     .jewel-chip-list.return
       position: absolute
       //width: 23.390%
       width: 35%
-      left: 60%
+      left: 8%
       top: 65%
-    > .header, > .footer
-      position: absolute
-      width: 100%
-      text-align: center
-    > .header
-      top: 0
     > .footer
-      bottom: 0
+      position: absolute
+      width: 95%
+      text-align: right
+      right: 5%
+      bottom: 5%
 
   .zoom-field
     position: absolute
@@ -734,11 +732,43 @@ body
     cursor: pointer
     &:hover
       color: coral
+  #layout-buttons
+    position: absolute
+    right: 3%
+    top: 2%
+    color: white
+    i
+      cursor: pointer
+      &:hover
+        color: coral
   &.game-3users
     .user.left
       top: 25%
     .zoom-field
       top: 70%
+  &.my-view
+    .user.others
+      display: none
+    .zoom-field
+      top: 10%
+      right: 0
+      width: 25%
+      height: 38%
+    .action-field
+      width: 25%
+      height: 38%
+      top: 62%
+      left: 75%
+    .center-field
+      top: 0
+      left: 0
+      width: 75%
+      height: 65%
+    .user.me
+      width: 73%
+      height: 37%
+      top: 64%
+      left: 2%
 
 
 .game-view

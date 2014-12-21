@@ -4,7 +4,9 @@ class BSplendor.Views.Game.Base extends Backbone.View
 
   events:
     "mousemove": "mousemoved"
-    "click #run-robot": "robotRun"
+    #"click #run-robot": "robotRun"
+    "click #layout-buttons .layout-full-view": "fullView"
+    "click #layout-buttons .layout-my-view": "myView"
 
   className: 'game-view'
 
@@ -64,10 +66,16 @@ class BSplendor.Views.Game.Base extends Backbone.View
       view.render()
       @$el.find(".game").append view.el
 
-  robotRun: ->
-    if @model.get("id")
-      $.ajax
-        url: "/games/#{@model.get("id")}/run",
-        success: ->
+  #robotRun: ->
+  #  if @model.get("id")
+  #    $.ajax
+  #      url: "/games/#{@model.get("id")}/run",
+  #      success: ->
+
+  fullView: ->
+    @$el.find(".game").addClass("full-view").removeClass("my-view")
+
+  myView: ->
+    @$el.find(".game").addClass("my-view").removeClass("full-view")
 
 
