@@ -7,8 +7,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.1.2'
 gem 'mysql2'
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 4.0.3'
-gem 'compass-rails'
+gem 'sass-rails', github: 'rails/sass-rails', branch: '4-0-stable'
 gem 'uglifier', '>= 1.3.0'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 # gem 'therubyracer',  platforms: :ruby

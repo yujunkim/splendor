@@ -1,5 +1,8 @@
 class BSplendor.Models.Card extends Backbone.Model
 
+  defaults:
+    className: "Card"
+
   initialize: ->
     @purchasableUser = []
 

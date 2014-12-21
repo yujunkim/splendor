@@ -26,9 +26,12 @@
 /* firefox 19+
 /* ie
 .center-center
-  display: flex
+  display: -webkit-flex     // NEW - Chrome
+  display: flex             // NEW, Spec - Opera 12.1, Firefox 20+
   justify-content: center
+  -webkit-justify-content: center // Safari 6.1+
   align-items: center
+  -webkit-align-items: center // Safari 6.1+
 
 .color-diamond
   background-color: white
@@ -149,6 +152,7 @@ html, body
             color: white
             left: 45%
             flex-direction: column
+            -webkit-flex-direction: column
             i.fa
               cursor: pointer
               margin-bottom: 50%

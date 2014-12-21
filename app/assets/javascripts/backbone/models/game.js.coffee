@@ -206,7 +206,7 @@ class BSplendor.Models.Game extends Backbone.Model
     else
       @hoverAlone(view.$el)
       @recentEvent = event
-      switch view.model.constructor.name
+      switch view.model.get("className")
         when "Card"
           if view.collection && view.collection.type == "pack"
             @zoomField.visualize("packCardList", view.collection)

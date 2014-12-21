@@ -1,5 +1,8 @@
 class BSplendor.Models.JewelChip extends Backbone.Model
 
+  defaults:
+    className: "JewelChip"
+
   initialize: ->
 
   pushReceive: =>

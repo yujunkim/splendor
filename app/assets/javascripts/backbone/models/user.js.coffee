@@ -1,10 +1,12 @@
 class BSplendor.Models.User extends Backbone.Model
 
+  defaults:
+    className: "User"
+
   initialize: ->
     @on "change", ()=>
       @addStyle("background-color")
       @addStyle("color")
-
 
   setupGame: =>
     options = { user: @ }
@@ -94,7 +96,7 @@ class BSplendor.Models.User extends Backbone.Model
   addStyle: (style) ->
     stylesheet = document.styleSheets[0]
     selector = ".user.hovered .user-#{style}-#{@get("id")}"
-    rule = "{#{style}: #{@get("color")} !important"
+    rule = "{#{style}: #{@get("color")} !important }"
     if stylesheet.insertRule
       stylesheet.insertRule selector + rule, stylesheet.cssRules.length
     else stylesheet.addRule selector, rule, -1  if stylesheet.addRule
