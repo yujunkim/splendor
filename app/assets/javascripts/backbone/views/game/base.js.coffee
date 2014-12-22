@@ -66,12 +66,6 @@ class BSplendor.Views.Game.Base extends Backbone.View
       view.render()
       @$el.find(".game").append view.el
 
-  #robotRun: ->
-  #  if @model.get("id")
-  #    $.ajax
-  #      url: "/games/#{@model.get("id")}/run",
-  #      success: ->
-
   fullView: ->
     @$el.find(".game").addClass("full-view").removeClass("my-view")
 

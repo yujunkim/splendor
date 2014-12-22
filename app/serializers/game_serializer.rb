@@ -2,7 +2,8 @@ class GameSerializer < Thriftify
   attributes :id,
              :currentTurnUserId,
              :orderUserIds,
-             :winnerId
+             :winnerId,
+             :chiefId
 
   def currentTurnUserId
     object.current_turn_user_id
@@ -14,6 +15,10 @@ class GameSerializer < Thriftify
 
   def winnerId
     object.winner_id
+  end
+
+  def chiefId
+    object.users.human.first.try(:id)
   end
 
   has_many :users

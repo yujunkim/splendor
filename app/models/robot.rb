@@ -37,7 +37,13 @@ class Robot
         request = game.request
         uri = URI.parse("http://#{request.host_with_port}/games/#{game.id}/robot_play")
         uri.query = params.to_query
-        uri.open
+        10.times do
+          begin
+            uri.open
+            break
+          rescue
+          end
+        end
       end
     end
   end

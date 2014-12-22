@@ -1,12 +1,12 @@
 class Game < ActiveRecord::Base
-  has_many :game_user_associations
+  has_many :game_user_associations, dependent: :destroy
   has_many :users, -> { order('game_user_associations.order ASC') }, through: :game_user_associations
   belongs_to :current_turn_user, class_name: :User
   belongs_to :winner, class_name: :User
-  has_many :cards
-  has_many :jewel_chips
-  has_many :jewelChips
-  has_many :nobles
+  has_many :cards, dependent: :destroy
+  has_many :jewel_chips, dependent: :destroy
+  has_many :jewelChips, dependent: :destroy
+  has_many :nobles, dependent: :destroy
 
   attr_accessor :request
 
@@ -94,9 +94,9 @@ class Game < ActiveRecord::Base
   end
 
   def validation(type, user, data)
-    def jewel_chip_count(jewel_chip_map)
-      return 0 if jewel_chip_map.blank?
-      jewel_chip_map.map{|jewel_chip, count| count.to_i}.inject{|sum,x| sum + x }
+    def jewel_chip_types(jewel_chip_map)
+      return [] if jewel_chip_map.blank?
+      jewel_chip_map.map{|jewel_chip, count| Array.new(count.to_i, jewel_chip)}.flatten
     end
 
     able = true
@@ -110,9 +110,14 @@ class Game < ActiveRecord::Base
     when "receive_jewel_chip"
       able &&= (
         user.jewel_chips.where(game_id: id).count +
-        jewel_chip_count(data[:receiveJewelChipMap]) -
-        jewel_chip_count(data[:returnJewelChipMap]) <= 10
+        jewel_chip_types(data[:receiveJewelChipMap]).count -
+        jewel_chip_types(data[:returnJewelChipMap]).count <= 10
       )
+
+      receive_jewel_chip_types = jewel_chip_types(data[:receiveJewelChipMap])
+      if able && receive_jewel_chip_types.count == 2 && receive_jewel_chip_types.uniq.count == 1
+        able &&= self.jewel_chips.where(jewel_type: receive_jewel_chip_types.first, user_id: nil).count >= 4
+      end
     else
       able = false
     end
@@ -141,7 +146,7 @@ class Game < ActiveRecord::Base
   def game_over(user)
     return false if user.id != users.map(&:id).last
     self.users.map do |u|
-      u.total_point(self) > 15
+      u.total_point(self) >= 15
     end.uniq != [false]
   end
 

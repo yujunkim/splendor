@@ -5,11 +5,20 @@ class User < ActiveRecord::Base
   has_many :cards
   has_many :jewel_chips
   has_many :nobles
+  scope :human, -> { where(robot: false) }
+  scope :robot, -> { where(robot: true) }
 
   before_create :fill_auth_token
   before_create :fill_sample_name
   before_create :fill_sample_color
   before_create :fill_default_home
+  before_destroy :destroy_related_games
+
+  def destroy_related_games
+    games.each do |game|
+      game.destroy
+    end
+  end
 
   def fill_auth_token
     self.auth_token = Forgery('basic').encrypt

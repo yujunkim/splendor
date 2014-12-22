@@ -96,13 +96,16 @@ class BSplendor.Models.Game extends Backbone.Model
       able = true
       receiveJewelChipList = @actionField.receiveJewelChipList
       returnJewelChipList = @actionField.returnJewelChipList
-      able &&= jewelChip.get("jewelType") != "gold"
+      wantJewelType = jewelChip.get("jewelType")
+      able &&= wantJewelType != "gold"
       able &&= receiveJewelChipList.length < 3
       able &&= (@me.totalJewelChipCount() + receiveJewelChipList.length) < 10
+      if able && receiveJewelChipList.length == 1 && wantJewelType == receiveJewelChipList.models[0].get("jewelType")
+        able &&= @centerField.jewelChip[wantJewelType].length > 3
       if able && receiveJewelChipList.length == 2
         jewelChipTypes = _.map receiveJewelChipList.models, (j) ->
           j.get("jewelType")
-        jewelChipTypes.push(jewelChip.get("jewelType"))
+        jewelChipTypes.push(wantJewelType)
         able &&= _.uniq(jewelChipTypes).length == 3
       able
 
@@ -127,6 +130,7 @@ class BSplendor.Models.Game extends Backbone.Model
   actionPerformed: (type, data) =>
     @resetCardPurchasable()
     @clearAlertTimeout()
+    @clearRobotTimeout()
     user = @users[data.userId]
 
     if data.purchasedCard && purchasedCard = @dic.card[data.purchasedCard.id]
@@ -166,6 +170,8 @@ class BSplendor.Models.Game extends Backbone.Model
     _.each @users, (user, id) =>
       if @userTurn(user)
         user.set(currentTurn: true)
+        if user.get("robot") && @get("chiefId") == @me.get("id")
+          @setRobotTimeout()
       else
         user.set(currentTurn: undefined)
     if @userTurn(@me)
@@ -178,6 +184,20 @@ class BSplendor.Models.Game extends Backbone.Model
       clearTimeout(@alertTimeout)
       @alertTimeout = undefined
       $("body").removeClass("alert-opacity")
+
+  clearRobotTimeout: ()=>
+    if @robotTimeout
+      clearTimeout(@robotTimeout)
+      @robotTimeout = undefined
+
+  setRobotTimeout: =>
+    @robotTimeout = setTimeout(=>
+      if game.get("id")
+        $.ajax
+          url: "/games/#{game.get("id")}/run",
+          success: ->
+      @setRobotTimeout()
+    , 5000)
 
   setCardPurchasable: () =>
     _.each @users, (user, userId) =>
