@@ -6,20 +6,24 @@ class GamesController < ApplicationController
 
   def run
     game = Game.find_by_id(params[:id])
-    return unless game.current_turn_user.robot
-    game.request = request
-    game.run
+    if game.current_turn_user.robot
+      game.request = request
+      game.run
+      render text: "running!"
+    else
+      render text: "not robot!"
+    end
 
-    render text: "running!"
   end
 
   def robot_play
     game = Game.find_by_id(params[:id])
-    return unless game.current_turn_user.robot
-    robot_user = game.current_turn_user
+    if game.current_turn_user.robot
+      robot_user = game.current_turn_user
 
-    game.request = request
-    game.action(robot_user, params)
+      game.request = request
+      game.action(robot_user, params)
+    end
 
     render nothing: true
   end
