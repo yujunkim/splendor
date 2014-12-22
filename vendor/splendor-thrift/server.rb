@@ -49,10 +49,21 @@ class PlayerHandler
 
     if jewel_chip_map.count > 2
       Hash[jewel_chip_map.keys.sample(3).map do |sample_jewel_type|
-             [sample_jewel_type, 1]
-           end]
+        [sample_jewel_type, 1]
+      end]
     else
-      { jewel_chip_map.keys.sample => 2 }
+      map = nil
+      jewel_chip_map.keys.shuffle.each do |jewel_type|
+        map = { jewel_type => 2 } if jewel_chip_map[jewel_type] >= 4
+      end
+
+      if map.nil?
+        map = Hash[jewel_chip_map.keys.map do |jewel_type|
+          [jewel_type, 1]
+        end]
+      end
+
+      map
     end
   end
 

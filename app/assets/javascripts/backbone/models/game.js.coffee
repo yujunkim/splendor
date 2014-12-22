@@ -251,7 +251,7 @@ class BSplendor.Models.Game extends Backbone.Model
         when "User"
           @zoomField.visualize("user", view.model)
 
-    if view.model.constructor.name == "User"
+    if view.model.get("className")
       view.$el.find(".background").addClass("user-background-color user-background-color-#{view.model.get("id")}")
       game.resetHighlightPurchasableCards()
       game.highlightPurchasableCards(view.model)

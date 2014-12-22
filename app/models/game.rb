@@ -90,6 +90,8 @@ class Game < ActiveRecord::Base
     if self.validation(method, user, options)
       action_opts = self.send(method.underscore, user, options)
       self.after_action(user, method, action_opts)
+    else
+      Rails.logger.info(user, options)
     end
   end
 

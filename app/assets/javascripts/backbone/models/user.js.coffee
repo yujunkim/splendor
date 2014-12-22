@@ -5,6 +5,7 @@ class BSplendor.Models.User extends Backbone.Model
 
   initialize: ->
     @on "change", ()=>
+      $("head .user-style-#{@get("id")}").remove()
       @addStyle("background-color")
       @addStyle("color")
 
@@ -94,9 +95,4 @@ class BSplendor.Models.User extends Backbone.Model
     @set(currentTurn: undefined)
 
   addStyle: (style) ->
-    stylesheet = document.styleSheets[0]
-    selector = ".user.hovered .user-#{style}-#{@get("id")}"
-    rule = "{#{style}: #{@get("color")} !important }"
-    if stylesheet.insertRule
-      stylesheet.insertRule selector + rule, stylesheet.cssRules.length
-    else stylesheet.addRule selector, rule, -1  if stylesheet.addRule
+    $("head").append("<style class='user-style-#{@get("id")}'> .user.hovered .user-#{style}-#{@get("id")} {#{style}: #{@get("color")} !important }</style>");
