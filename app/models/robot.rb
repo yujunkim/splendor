@@ -4,15 +4,22 @@ class Robot
 
   def self.play(game)
     fork do
-      sleep(0.5)
+      sleep(0.1)
       robot_user = game.current_turn_user
+      action_result = nil
       begin
-        client = ThriftClient.new(SplendorThrift::Player::Client, robot_user.home , retries: 2)
-        action_result = client.play(
-          GameSerializer.new(game, root: false, scope: robot_user).as_thrift
-        )
+        if robot_user.home
+          client = ThriftClient.new(SplendorThrift::Player::Client, robot_user.home , retries: 2)
+          action_result = client.play(
+            GameSerializer.new(game, root: false, scope: robot_user).as_thrift
+          )
+        end
       rescue ThriftClient::NoServersAvailable
-        action_result = $thrift_client.play(
+        Rails.logger.debug("NoServersAvailable")
+      end
+
+      if action_result.blank?
+        action_result = ThriftPlayerHandler.new.play(
           GameSerializer.new(game, root: false, scope: robot_user).as_thrift
         )
       end

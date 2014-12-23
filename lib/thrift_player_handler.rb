@@ -1,11 +1,10 @@
-$:.push("gen-rb")
-
+$:.push(Rails.root + "vendor/splendor-thrift/gen-rb")
 require 'thrift'
 
 require 'player'
 require 'pry'
 
-class PlayerHandler
+class ThriftPlayerHandler
   def initialize()
   end
 
@@ -101,7 +100,7 @@ class PlayerHandler
       after_receive_jewel_count =
         game.jewelChips.select{|jewel_chip| jewel_chip.userId == my_id}.count +
         action_result.receiveJewelChipMap.map{|jewel_chip, count| count}
-                                         .inject{|sum,x| sum + x }
+                                         .inject{|sum,x| sum + x }.to_i
 
       if after_receive_jewel_count > 10
         action_result.returnJewelChipMap =
@@ -111,17 +110,4 @@ class PlayerHandler
 
     action_result
   end
-
-end
-
-def thrift_server_start
-  handler = PlayerHandler.new()
-  processor = SplendorThrift::Player::Processor.new(handler)
-  transport = Thrift::ServerSocket.new("localhost", 9090)
-  transportFactory = Thrift::FramedTransportFactory.new()
-  server = Thrift::SimpleServer.new(processor, transport, transportFactory)
-
-  puts "Starting the server..."
-  server.serve()
-  puts "done."
 end

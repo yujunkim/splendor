@@ -11,7 +11,6 @@ class User < ActiveRecord::Base
   before_create :fill_auth_token
   before_create :fill_sample_name
   before_create :fill_sample_color
-  before_create :fill_default_home
   before_destroy :destroy_related_games
 
   def destroy_related_games
@@ -31,10 +30,6 @@ class User < ActiveRecord::Base
 
   def fill_sample_color
     self.color = Forgery('basic').color.underscore
-  end
-
-  def fill_default_home
-    self.home = "127.0.0.1:9090"
   end
 
   def purchase(card)
