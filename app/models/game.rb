@@ -1,20 +1,37 @@
-class Game < ActiveRecord::Base
-  has_many :game_user_associations, dependent: :destroy
-  has_many :users, -> { order('game_user_associations.order ASC') }, through: :game_user_associations
-  belongs_to :current_turn_user, class_name: :User
-  belongs_to :winner, class_name: :User
-  has_many :cards, dependent: :destroy
-  has_many :jewel_chips, dependent: :destroy
-  has_many :jewelChips, dependent: :destroy
-  has_many :nobles, dependent: :destroy
+class Game
+  #has_many :game_user_associations, dependent: :destroy
+  #has_many :users, -> { order('game_user_associations.order ASC') }, through: :game_user_associations
+  #belongs_to :current_turn_user, class_name: :User
+  #belongs_to :winner, class_name: :User
+  #has_many :cards, dependent: :destroy
+  #has_many :jewel_chips, dependent: :destroy
+  #has_many :jewelChips, dependent: :destroy
+  #has_many :nobles, dependent: :destroy
 
-  attr_accessor :request
+  include ActiveModel::Model
+  include ActiveModel::Serialization
 
-  # {
-  #   user_ids: [],
-  #   robot_count: 0
-  # }
-  def self.generate(options)
+  attr_accessor :players,
+                :winner,
+                :center_field,
+                :dic
+
+  attr_accessor :id
+
+  attr_accessor :host_with_port,
+                :runner_count
+
+  alias_method :centerField, :center_field
+
+  def self.all
+    Splendor::Application::Record[:game]
+  end
+
+  def self.find_by_id(id)
+    Splendor::Application::Record[:game][id]
+  end
+
+  def initialize(options)
     def self.generate_validation(options)
       able = true
       able &&= options[:user_ids] && options[:robot_count]
@@ -25,100 +42,113 @@ class Game < ActiveRecord::Base
     end
 
     return unless generate_validation(options)
-    users = User.where(id: (options[:user_ids] || [])).to_a
+
+    self.id = Forgery('basic').text
+    self.runner_count = 0
+    Splendor::Application::Record[:game][id] = self
+
+    options[:robot_count] ||= 0
+    options[:user_ids] ||= []
+
+    self.players ||= []
+    self.dic = {
+      cards: {},
+      jewel_chips: {},
+      nobles: {}
+    }
+
+    chief_choosed = false
+    options[:user_ids].each do |user_id|
+      user = User.find_by_id(user_id)
+      if user
+        player = Player.new(game: self, user: user)
+        unless chief_choosed
+          player.is_chief = true
+          chief_choosed = true
+        end
+        self.players << player
+      end
+    end
+
     (options[:robot_count] || 0).times do |i|
-      users << User.create(robot: true)
+      robot_player = Player.new(game: self, is_robot: true)
+      self.players << robot_player
     end
-    g = Game.create
-    user_ids = users.shuffle.map(&:id)
-    user_ids.each_with_index do |user_id, idx|
-      GameUserAssociation.create(game_id: g.id, user_id: user_id, order: idx)
-    end
+    self.players.shuffle!
 
-    g.current_turn_user_id = user_ids.first
-    g.save
+    self.center_field = CenterField.new(game: self)
 
-    Card.generate(g)
-    JewelChip.generate(g)
-    Noble.generate(g)
-    g
+    Card.generate(self)
+    JewelChip.generate(self)
+    Noble.generate(self)
   end
 
   def run
-    if Splendor::Application::GAME_RUNNER[self.id]
-      Splendor::Application::GAME_RUNNER[self.id] -= 1
-    else
-      Splendor::Application::GAME_RUNNER[self.id] = 0
-    end
+    self.runner_count -= 1
+    self.runner_count = 0 if self.runner_count < 0
 
-    if Splendor::Application::GAME_RUNNER[self.id] == 0
-      Splendor::Application::GAME_RUNNER[self.id] += 1
+    if self.runner_count == 0
+      self.runner_count += 1
       Robot.play(self)
     end
   end
 
-  def pickup_unrevealed_card(grade)
-    return if self.cards.where(revealed: true, card_grade: grade, user_id: nil).count >= 4
-    card = self.cards.where(revealed: false, card_grade: grade, user_id: nil).sample
-    return unless card
-    card.revealed = true
-    card.save
-    card
-  end
-
   def next_turn
-    user_ids = users.map(&:id)
-    idx = user_ids.index(current_turn_user_id)
-    idx += 1
-    idx = 0 if idx == user_ids.length
-    self.current_turn_user_id = user_ids[idx]
-    self.save
+    players << players.shift
   end
 
-  def sample_jewel_chips
-    groups = jewel_chips.where(user_id: nil).where.not(jewel_type: "gold").group(:jewel_type)
-    if groups.count.count > 2
-      groups.to_a.sample(3)
-    else
-      jewel_chips.where(user_id: nil).where.not(jewel_type: "gold").first(2)
+  def action(player, options)
+    def options_transform(options)
+      if options[:receiveJewelChipMap]
+        options[:receiveJewelChipMap] = Hash[options[:receiveJewelChipMap].map do |key, value|
+          [key.to_sym, value.to_i]
+        end]
+      end
+      if options[:returnJewelChipMap]
+        options[:returnJewelChipMap] = Hash[options[:returnJewelChipMap].map do |key, value|
+          [key.to_sym, value.to_i]
+        end]
+      end
+      options
     end
-  end
-
-  def action(user, options)
+    options = options_transform(options)
     method = options[:actionType].underscore
+
     return unless ["purchase_card", "reserve_card", "receive_jewel_chip"].include?(method)
-    if self.validation(method, user, options)
-      action_opts = self.send(method.underscore, user, options)
-      self.after_action(user, method, action_opts)
+    if self.validation(method, player, options)
+      action_opts = self.send(method.underscore, player, options)
+      self.after_action(player, method, action_opts)
     else
-      Rails.logger.info(user, options)
+      binding.pry
+      Rails.logger.info(player)
+      Rails.logger.info(options)
     end
   end
 
-  def validation(type, user, data)
+  def validation(type, player, data)
     def jewel_chip_types(jewel_chip_map)
       return [] if jewel_chip_map.blank?
-      jewel_chip_map.map{|jewel_chip, count| Array.new(count.to_i, jewel_chip)}.flatten
+      jewel_chip_map.map{|jewel_chip, count| Array.new(count.to_i, jewel_chip.to_sym)}.flatten
     end
 
     able = true
-    able &&= self.current_turn_user_id == user.id
+    able &&= self.players.first == player
     case type
     when "purchase_card"
-      card = Card.find_by_id(data[:cardId])
-      able &&= user.purchase_validation(card, data[:returnJewelChipMap])
+      card = dic[:cards][data[:cardId]]
+      able &&= player.purchase_validation(card, data[:returnJewelChipMap])
     when "reserve_card"
-      able &&= user.jewel_chips.where(game_id: id).count + jewel_chip_count(data[:receiveJewelChipMap]) <= 10
+      able &&= player.jewel_chips.values.flatten.count + jewel_chip_count(data[:receiveJewelChipMap]) <= 10
     when "receive_jewel_chip"
       able &&= (
-        user.jewel_chips.where(game_id: id).count +
+        player.jewel_chips.values.flatten.count +
         jewel_chip_types(data[:receiveJewelChipMap]).count -
         jewel_chip_types(data[:returnJewelChipMap]).count <= 10
       )
 
       receive_jewel_chip_types = jewel_chip_types(data[:receiveJewelChipMap])
       if able && receive_jewel_chip_types.count == 2 && receive_jewel_chip_types.uniq.count == 1
-        able &&= self.jewel_chips.where(jewel_type: receive_jewel_chip_types.first, user_id: nil).count >= 4
+        able &&= self.center_field.jewel_chips[receive_jewel_chip_types.first].count >= 4
       end
     else
       able = false
@@ -126,45 +156,44 @@ class Game < ActiveRecord::Base
     able
   end
 
-  def after_action(user, type, options)
+  def after_action(player, type, options)
     next_turn
     WebsocketRails["game#{id}"].subscribers.each do |connection|
       connection.send_message :action_performed, type: type,
-        d: game_update_data(user, options.merge(scope: connection.user))
+        d: game_update_data(player, options.merge(scope: connection.user))
     end
 
-    choose_winner if game_over(user)
+    choose_winner if game_over(player)
 
     if winner
       WebsocketRails["game#{id}"].subscribers.each do |connection|
         connection.send_message :game_over,
-          winner: UserSerializer.new(winner, root: false, scope: connection.user)
+          winnerId: winner.id
       end
     else
-      run if self.current_turn_user.robot
+      run if self.players.first.is_robot
     end
   end
 
-  def game_over(user)
-    return false if user.id != users.map(&:id).last
-    self.users.map do |u|
-      u.total_point(self) >= 15
+  def game_over(player)
+    return false if player.id != players.map(&:id).last
+    self.players.map do |p|
+      p.total_point >= 15
     end.uniq != [false]
   end
 
   def choose_winner
-    point2user = {}
-    self.users.each do |u|
-      point = u.total_point(self)
-      card_count = u.total_cards(self).count
-      point2user[point] ||= {}
-      point2user[point][card_count] ||= []
-      point2user[point][card_count] << u
+    point2player = {}
+    self.players.each do |p|
+      point = p.total_point
+      card_count = p.total_cards.count
+      point2player[point] ||= {}
+      point2player[point][card_count] ||= []
+      point2player[point][card_count] << p
     end
-    card_count2user = point2user.sort.reverse.first.last
-    top_users = card_count2user.sort.reverse.first.last
-    self.winner = top_users.sample
-    self.save
+    card_count2player = point2player.sort.reverse.first.last
+    top_players = card_count2player.sort.reverse.first.last
+    self.winner = top_players.sample
 
     winner
   end
@@ -178,14 +207,19 @@ class Game < ActiveRecord::Base
     GameUpdateSerializer.new self, options.merge(user: user, root: false)
   end
 
-  def purchase_card(user, data)
-    purchased_card = Card.find_by_id(data[:cardId])
-    user.purchase(purchased_card)
-    hired_noble = user.hire_noble(self)
+  def purchase_card(player, data)
+    purchased_card = dic[:cards][data[:cardId]]
+    center_field.remove(purchased_card)
+    player.purchase(purchased_card)
 
-    revealed_card = purchased_card.game.pickup_unrevealed_card(purchased_card.card_grade)
+    if hired_noble = player.hireable_nobles(self).first
+      center_field.remove(hired_noble)
+      player.hire(hired_noble)
+    end
 
-    returned_jewel_chips = user.return(self, data[:returnJewelChipMap])
+    revealed_card = center_field.pickup_unrevealed_card(purchased_card.card_grade)
+
+    returned_jewel_chips = player.return(self, data[:returnJewelChipMap])
 
     {
       purchased_card: purchased_card,
@@ -195,13 +229,14 @@ class Game < ActiveRecord::Base
     }
   end
 
-  def reserve_card(user, data)
-    reserved_card = Card.find_by_id(data[:cardId])
-    user.reserve(reserved_card)
+  def reserve_card(player, data)
+    reserved_card = dic[:cards][data[:cardId]]
+    center_field.remove(reserved_card)
+    player.reserve(reserved_card)
 
-    revealed_card = reserved_card.game.pickup_unrevealed_card(reserved_card.card_grade)
+    revealed_card = center_field.pickup_unrevealed_card(purchased_card.card_grade)
 
-    received_jewel_chips = user.receive(self, data[:receiveJewelChipMap])
+    received_jewel_chips = player.receive(self, data[:receiveJewelChipMap])
 
     {
       reserved_card: reserved_card,
@@ -210,9 +245,9 @@ class Game < ActiveRecord::Base
     }
   end
 
-  def receive_jewel_chip(user, data)
-    received_jewel_chips = user.receive(self, data[:receiveJewelChipMap])
-    returned_jewel_chips = user.return(self, data[:returnJewelChipMap])
+  def receive_jewel_chip(player, data)
+    received_jewel_chips = player.receive(self, data[:receiveJewelChipMap])
+    returned_jewel_chips = player.return(self, data[:returnJewelChipMap])
 
     {
       received_jewel_chips: received_jewel_chips,

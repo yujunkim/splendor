@@ -7,7 +7,7 @@ class BSplendor.Views.JewelChipList.Base extends Backbone.View
   template: JST["backbone/templates/jewel_chip_list/base"]
 
   initialize: ->
-    @$el.addClass(@options.type)
+    @$el.addClass(@options.jewelType)
     @collection.on('add', @addOne, @)
     @collection.on('remove', @render, @)
 

@@ -1,19 +1,21 @@
 class CardSerializer < Thriftify
   attributes :id,
-             :userId,
              :cardGrade,
              :jewelType,
              :point,
              :costs,
-             :revealed,
-             :reserved
+             :revealed
 
   def revealed
-    @revealed ||= !!(object.revealed || (options[:scope] && options[:scope].id == object.user_id))
+    @revealed ||= !!(object.revealed || mine)
   end
 
-  def userId
-    object.user_id
+  def mine
+    player_mine = object.player && options[:player] && options[:player].id == object.player.id
+
+    scope_mine = object.player && object.player.user && options[:scope] && options[:scope].id == object.player.user.id
+
+    player_mine || scope_mine
   end
 
   def cardGrade
@@ -27,13 +29,7 @@ class CardSerializer < Thriftify
 
   def costs
     return unless revealed
-    {
-      diamond: object.diamond,
-      sapphire: object.sapphire,
-      emerald: object.emerald,
-      ruby: object.ruby,
-      onyx: object.onyx
-    }
+    object.costs
   end
 
   def point

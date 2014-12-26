@@ -1,7 +1,7 @@
 class GameUpdateSerializer < ActiveModel::Serializer
   attributes :id,
-             :currentTurnUserId,
-             :userId,
+             :currentTurnPlayerId,
+             :playerId,
              :hiredNoble,
              :purchasedCard,
              :reservedCard,
@@ -9,12 +9,12 @@ class GameUpdateSerializer < ActiveModel::Serializer
              :receivedJewelChips,
              :returnedJewelChips
 
-  def currentTurnUserId
-    object.current_turn_user_id
+  def currentTurnPlayerId
+    object.players.first.id
   end
 
-  def userId
-    options[:user].id
+  def playerId
+    object.players.last.id
   end
 
   def hiredNoble

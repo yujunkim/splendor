@@ -24,5 +24,5 @@ class BSplendor.Models.JewelChip extends Backbone.Model
         game.actionField.popReceive(@)
       else if @collection.type == "return"
         game.actionField.popReturn(@)
-    else if @collection.user && @collection.user.get("me")
+    else if @collection.player && @collection.player.get("me")
       game.returnJewelChip @

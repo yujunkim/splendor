@@ -4,33 +4,54 @@ class BSplendor.Models.CenterField extends Backbone.Model
     @refreshData()
 
   refreshData: =>
-    @nobleList = new BSplendor.Collections.NobleList([], { centerField: @ })
+    @nobles = new BSplendor.Collections.NobleList([], { centerField: @ })
 
-    @pack = {}
-    @exhibition = {}
-    @jewelChip = {}
+    @cards = {
+      pack: {},
+      exhibition: {}
+    }
+    @jewelChips = {}
+    game = @get("game")
 
     _(3).times (i) =>
       cardGrade = i+1
-      @pack[cardGrade] = new BSplendor.Collections.CardList [],
+      @cards.pack[cardGrade] = new BSplendor.Collections.CardList [],
         centerField: @, type: "pack", cardGrade: cardGrade
-      @exhibition[cardGrade] = new BSplendor.Collections.CardList [],
+      @cards.exhibition[cardGrade] = new BSplendor.Collections.CardList [],
         centerField: @, type: "exhibition", cardGrade: cardGrade
 
-    @get("game").jewelTypes.forEach (jewelType) =>
+    game.jewelTypes.forEach (jewelType) =>
       jewelChipListOptions = { centerField: @, type: jewelType }
-      @jewelChip[jewelType] = new BSplendor.Collections.JewelChipList([], jewelChipListOptions)
+      @jewelChips[jewelType] = new BSplendor.Collections.JewelChipList([], jewelChipListOptions)
+
+    _.each @get("cards"), (locationValue, locationKey) =>
+      _.each locationValue, (cards, gradeKey) =>
+        cards.forEach (card) =>
+          card = new BSplendor.Models.Card(card)
+          game.dic.cards[card.get("id")] = card
+          @cards[locationKey][gradeKey].add(card)
+
+    @get("nobles").forEach (noble) =>
+      noble = new BSplendor.Models.Noble(noble)
+      game.dic.nobles[noble.get("id")] = noble
+      @nobles.add(noble)
+
+    _.each @get("jewelChips"), (jewelChips, jewelType) =>
+      jewelChips.forEach (jewelChip) =>
+        jewelChip = new BSplendor.Models.JewelChip(jewelChip)
+        game.dic.jewelChips[jewelChip.get("id")] = jewelChip
+        @jewelChips[jewelType].add(jewelChip)
 
   exhibit: (card) ->
     card.collection.remove(card)
     card.set(revealed: true)
-    @exhibition[card.get('cardGrade')].add(card)
+    @cards.exhibition[card.get('cardGrade')].add(card)
 
   pickOnePackCard: (level)->
-    sample = @pack[level].shuffle()[0]
-    @pack[level].remove(sample)
-    @exhibition[level].add(sample)
+    sample = @cards.pack[level].shuffle()[0]
+    @cards.pack[level].remove(sample)
+    @cards.exhibition[level].add(sample)
 
   returnJewelChip: (jewelChip) =>
-    @jewelChip[jewelChip.get("jewelType")].add jewelChip
+    @jewelChips[jewelChip.get("jewelType")].add jewelChip
 

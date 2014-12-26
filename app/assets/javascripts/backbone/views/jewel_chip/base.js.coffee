@@ -22,5 +22,5 @@ class BSplendor.Views.JewelChip.Base extends Backbone.View
 
   mousemoved: (e) ->
     return unless @collection
-    e.stopPropagation() unless @model.collection? && @model.collection.user?
+    e.stopPropagation() unless @model.collection? && @model.collection.player?
     game.trigger("gameChildHovered", e, @)

@@ -1,4 +1,4 @@
-$ ->
+window.initOperator = ->
   window.splendorController = new Splendor.Controller($(document.body).data("websocket-uri"), true);
   cf.reset() if cf?
 
@@ -10,6 +10,7 @@ class Splendor.Controller
   constructor: (url,useWebSockets) ->
     @dispatcher = new WebSocketRails(url,useWebSockets)
     @dispatcher.on_open = @ready
+    @dispatcher.on_close = @closed
     @bindEvents()
 
   bindEvents: =>
@@ -23,17 +24,20 @@ class Splendor.Controller
   addUser: (userHash) ->
     user = new BSplendor.Models.User(userHash)
     Splendor.Users[user.get("id")] = user
-    Splendor.Me = user if user.get("me")
+    Splendor.Me = user if user.get("isMe")
     user
 
   removeUser: (id) ->
     delete Splendor.Users[id]
 
   ready: ()=>
+    @dispatcher.trigger 'login', facebook_user: window.facebookUser
     window.operator = new BSplendor.Models.Operator(splendorController: @)
     ov = new BSplendor.Views.Operator.Base(model: operator)
     ov.render()
     $(document.body).prepend(ov.el)
+
+  closed: ()=>
 
   updateUsers: (users) =>
     totalUserIds = _.map Splendor.Users, (user, id) => user.get("id")
@@ -47,6 +51,7 @@ class Splendor.Controller
     $(window).trigger("user.updated")
 
   gameStarted: (options)=>
+    console.log options
     @channel = @dispatcher.subscribe("game#{options.game.id}")
     @dispatcher.trigger "channel_subscribed", "game#{options.game.id}"
     @dispatcher.bind 'action_performed', @actionPerformed
@@ -63,7 +68,7 @@ class Splendor.Controller
     game.actionPerformed(message.type, message.d)
 
   gameOver: (message)->
-    game.gameOver(message.winner)
+    game.gameOver(message.winnerId)
 
   action: (data) =>
     @dispatcher.trigger "action", $.extend(data, gameId: game.id)

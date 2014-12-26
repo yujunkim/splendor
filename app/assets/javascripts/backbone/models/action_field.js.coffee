@@ -51,7 +51,7 @@ class BSplendor.Models.ActionField extends Backbone.Model
     @cardList.models.forEach (card) ->
       card.collection.remove(card)
       if card.get("userId") && card.get("reserved")
-        game.users[card.get("userId")].reservationCardList.add(card)
+        game.users[card.get("userId")].reservedCards.add(card)
       else
         game.centerField.exhibition[card.get("cardGrade")].add(card)
     _(@receiveJewelChipList.models.length).times () =>

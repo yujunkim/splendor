@@ -10,6 +10,11 @@
 </head>
 <body data-websocket-uri=<%= request.host %>:<%= request.port %>/websocket>
 
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+
+<div id="status">
+</div>
 <%= yield %>
 
 </body>

@@ -4,30 +4,30 @@ class BSplendor.Models.Card extends Backbone.Model
     className: "Card"
 
   initialize: ->
-    @purchasableUser = []
+    @purchasablePlayer = []
 
   cancel: ->
     if actionField = @collection.actionField
       actionField.reset()
 
   purchase: ->
-    if user = @collection.user
-      if user.get("me") && @collection.reservation
+    if player = @collection.player
+      if player.get("me") && @collection.reservation
         game.purchaseCard(@)
     else if @collection.type != "pack"
       game.purchaseCard(@)
 
   reserve: ->
-    return if @collection.actionField || @collection.user
+    return if @collection.actionField || @collection.player
     game.reserveCard(@)
 
   updateAttributes: (attrs)->
     @set(attrs)
 
-  setPurchasableUser: (user)->
-    @purchasableUser.push(user)
-    @trigger("purchasable-user-change")
+  setPurchasablePlayer: (player)->
+    @purchasablePlayer.push(player)
+    @trigger("purchasable-player-change")
 
-  resetPurchasableUser: ()->
-    @purchasableUser = []
-    @trigger("purchasable-user-change")
+  resetPurchasablePlayer: ()->
+    @purchasablePlayer = []
+    @trigger("purchasable-player-change")

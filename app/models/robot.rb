@@ -5,13 +5,13 @@ class Robot
   def self.play(game)
     fork do
       sleep(0.1)
-      robot_user = game.current_turn_user
+      robot_player = game.players.first
       action_result = nil
       begin
-        if robot_user.home
-          client = ThriftClient.new(SplendorThrift::Player::Client, robot_user.home , retries: 2)
+        if robot_player.home
+          client = ThriftClient.new(SplendorThrift::Player::Client, robot_player.home , retries: 2)
           action_result = client.play(
-            GameSerializer.new(game, root: false, scope: robot_user).as_thrift
+            GameSerializer.new(game, root: false, scope: robot_player).as_thrift
           )
         end
       rescue ThriftClient::NoServersAvailable
@@ -19,8 +19,8 @@ class Robot
       end
 
       if action_result.blank?
-        action_result = ThriftPlayerHandler.new.play(
-          GameSerializer.new(game, root: false, scope: robot_user).as_thrift
+        action_result = ThriftSplendorAiHandler.new.play(
+          GameSerializer.new(game, root: false, player: robot_player).as_thrift
         )
       end
 
@@ -41,8 +41,7 @@ class Robot
       end
 
       if action_result
-        request = game.request
-        uri = URI.parse("http://#{request.host_with_port}/games/#{game.id}/robot_play")
+        uri = URI.parse("http://#{game.host_with_port}/games/#{game.id}/robot_play")
         uri.query = params.to_query
         10.times do
           begin

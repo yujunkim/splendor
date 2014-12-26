@@ -6,8 +6,8 @@ class GamesController < ApplicationController
 
   def run
     game = Game.find_by_id(params[:id])
-    if game.current_turn_user.robot
-      game.request = request
+    if game.players.first.is_robot
+      game.host_with_port = request.host_with_port
       game.run
       render text: "running!"
     else
@@ -18,11 +18,11 @@ class GamesController < ApplicationController
 
   def robot_play
     game = Game.find_by_id(params[:id])
-    if game.current_turn_user.robot
-      robot_user = game.current_turn_user
+    if game.players.first.is_robot
+      robot_player = game.players.first
 
-      game.request = request
-      game.action(robot_user, params)
+      game.host_with_port = request.host_with_port
+      game.action(robot_player, params)
     end
 
     render nothing: true

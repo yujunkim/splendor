@@ -14,17 +14,17 @@ class CurrentUserProvider
 
     request = Rack::Request.new(@env)
 
-    auth_token = request.cookies[TOKEN_COOKIE]
+    id = request.cookies[TOKEN_COOKIE]
 
     current_user = nil
 
-    if auth_token && auth_token.length == 40
-      current_user = User.find_by_auth_token(auth_token)
+    if id && id.length == 40
+      current_user = User.find_by_id(id)
     end
 
     if current_user.nil?
-      current_user = User.create
-      cookies.permanent[TOKEN_COOKIE] = { value: current_user.auth_token, httponly: true }
+      current_user = User.new
+      cookies.permanent[TOKEN_COOKIE] = { value: current_user.id, httponly: true }
     end
 
     @env[CURRENT_USER_KEY] = current_user
@@ -32,7 +32,7 @@ class CurrentUserProvider
 
   # log on a user and set cookies and session etc.
   def log_on_user(user, session, cookies)
-    cookies.permanent[TOKEN_COOKIE] = { value: user.auth_token, httponly: true }
+    cookies.permanent[TOKEN_COOKIE] = { value: user.id, httponly: true }
     @env[CURRENT_USER_KEY] = user
   end
 

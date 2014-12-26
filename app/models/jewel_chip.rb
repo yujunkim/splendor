@@ -1,10 +1,34 @@
-class JewelChip < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :game
+class JewelChip
+  #belongs_to :user
+  #belongs_to :game
+
+  include ActiveModel::Model
+  include ActiveModel::Serialization
+
+  attr_accessor :player,
+                :game
+
+  attr_accessor :id,
+                :jewel_type
+
+  def initialize(game)
+    self.game = game
+    while id_sample = Forgery('basic').text
+      unless self.game.dic[:jewel_chips][id_sample]
+        self.id = id_sample
+        self.game.dic[:jewel_chips][id_sample] = self
+        break
+      end
+    end
+  end
+
+  def inspect
+    "JewelChip"
+  end
 
   def self.generate(game)
-    user_count = game.users.count
-    jewel_chip_count = case user_count
+    player_count = game.players.count
+    jewel_chip_count = case player_count
                   when 2 then 4
                   when 3 then 5
                   when 4 then 7
@@ -18,10 +42,9 @@ class JewelChip < ActiveRecord::Base
       gold: 5
     }.each do |type, count|
       count.times do
-        j = JewelChip.new
-        j.game = game
+        j = JewelChip.new(game)
         j.jewel_type = type
-        j.save
+        game.center_field.jewel_chips[type] << j
       end
     end
   end

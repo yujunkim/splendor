@@ -11,28 +11,26 @@ class BSplendor.Views.CenterField.Base extends Backbone.View
 
   render: ->
     @$el.html(@template @)
-    _.each @model.pack, (collection, level) =>
-      packCardListView = new BSplendor.Views.CardList.Pack
-        collection: collection,
-        level: level
-      packCardListView.render()
-      @$el.append packCardListView.el
-
-    _.each @model.exhibition, (collection, level) =>
-      exhibitionCardListView = new BSplendor.Views.CardList.Exhibition
-        collection: collection,
-        level: level
-      exhibitionCardListView.render()
-      @$el.append exhibitionCardListView.el
+    _.each @model.cards, (locationValue, locationKey) =>
+      _.each locationValue, (collection, gradeKey) =>
+        cardListViewClass = if locationKey == "pack"
+          BSplendor.Views.CardList.Pack
+        else if locationKey == "exhibition"
+          BSplendor.Views.CardList.Exhibition
+        cardListView = new cardListViewClass
+          collection: collection,
+          level: gradeKey
+        cardListView.render()
+        @$el.append cardListView.el
 
     nobleListView = new BSplendor.Views.NobleList.Base
-      collection: @model.nobleList
+      collection: @model.nobles
     nobleListView.render()
     @$el.append nobleListView.el
 
-    _.each @model.jewelChip, (collection, type) =>
+    _.each @model.jewelChips, (collection, jewelType) =>
       jewelChipListView = new BSplendor.Views.JewelChipList.Base
         collection: collection,
-        type: type
+        jewelType: jewelType
       jewelChipListView.render()
       @$el.append jewelChipListView.el

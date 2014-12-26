@@ -7,7 +7,6 @@ class BSplendor.Views.Operator.Base extends Backbone.View
     "click #start": "startGame"
     "click #cancel-start": "cancelStartGame"
     "click #restart": "restartGame"
-    "click #rename": "rename"
     "click #recolor": "recolor"
     "click #robotify": "robotify"
     "keypress #message": "messageKeypressed"
@@ -48,19 +47,15 @@ class BSplendor.Views.Operator.Base extends Backbone.View
   restartGame: ->
     splendorController.dispatcher.trigger 'restart_game'
 
-  rename: ->
-    name = prompt("set rename", Splendor.Me.get("name"))
-    splendorController.dispatcher.trigger 'setting', username: name if name?
-
   recolor: ->
     splendorController.dispatcher.trigger 'setting', color: true
 
   robotify: ->
     home = null
-    if !Splendor.Me.get("robot")
+    if !Splendor.Me.get("isRobot")
       home = prompt("set robot's home")
       home = null if home == ""
-    splendorController.dispatcher.trigger 'setting', robotify: !Splendor.Me.get("robot"), home: home
+    splendorController.dispatcher.trigger 'setting', robotify: !Splendor.Me.get("isRobot"), home: home
 
   sendMessage: (e) =>
     e.preventDefault()

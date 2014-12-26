@@ -1,20 +1,51 @@
-class Noble < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :game
+class Noble
+  #belongs_to :user
+  #belongs_to :game
 
-  def self.generate(game)
-    user_count = game.users.count
-    f = File.open("noble_sample.csv")
-    noble_samples = f.read.split("\n").map{|x| x.split(",")}
-    noble_samples.shuffle.first(user_count + 1).each do |s|
-      n = Noble.new
-      n.game = game
-      n.diamond, n.sapphire, n.emerald, n.ruby, n.onyx, n.point = s
-      n.save
+  include ActiveModel::Model
+  include ActiveModel::Serialization
+
+  attr_accessor :player,
+                :game
+
+  attr_accessor :id,
+                :point,
+                :costs
+
+  def initialize(game)
+    self.game = game
+    while id_sample = Forgery('basic').text
+      unless self.game.dic[:nobles][id_sample]
+        self.id = id_sample
+        self.game.dic[:nobles][id_sample] = self
+        break
+      end
     end
   end
 
-  def costs
-    self.attributes.symbolize_keys.slice(:diamond, :sapphire, :emerald, :ruby, :onyx)
+  def inspect
+    "Noble"
   end
+
+  def self.generate(game)
+    player_count = game.players.count
+    f = File.open("noble_sample.csv")
+    noble_samples = f.read.split("\n").map{|x| x.split(",")}
+    noble_samples.shuffle.first(player_count + 1).each do |s|
+      n = Noble.new(game)
+      diamond, sapphire, emerald, ruby, onyx, n.point = s
+      n.point = n.point.to_i
+
+      n.costs = {
+        diamond: diamond.to_i,
+        sapphire: sapphire.to_i,
+        emerald: emerald.to_i,
+        ruby: ruby.to_i,
+        onyx: onyx.to_i
+      }
+
+      game.center_field.nobles << n
+    end
+  end
+
 end

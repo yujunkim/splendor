@@ -8,7 +8,7 @@ require 'thrift'
 require 'splendor_thrift_types'
 
 module SplendorThrift
-  module Player
+  module SplendorAi
     class Client
       include ::Thrift::Client
 
