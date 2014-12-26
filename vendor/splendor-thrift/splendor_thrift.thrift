@@ -4,7 +4,7 @@ namespace rb splendorThrift
 */
 // This is also a valid comment
 
-typedef i32 id
+typedef string id
 
 enum JewelType {
   DIAMOND,
@@ -19,12 +19,6 @@ enum CardGrade {
   FIRST = 1,
   SECOND,
   THIRD
-}
-
-enum ActionType {
-  PURCHASE_CARD,
-  RESERVE_CARD,
-  RECEIVE_JEWEL_CHIP
 }
 
 enum CardLocation {
@@ -73,13 +67,28 @@ struct Game {
   3: required set<Player> players;
 }
 
-struct ActionResult {
-  1: required ActionType actionType;
-  2: optional id cardId;
-  3: optional map<JewelType, i32> receiveJewelChipMap;
-  4: optional map<JewelType, i32> returnJewelChipMap;
+struct PurchaseCard {
+  1: required id cardId,
+  2: optional id nobleId,
+  3: required map<JewelType, i32> returnJewelChipMap;
 }
 
+struct ReserveCard {
+  1: required id cardId,
+  2: required map<JewelType, i32> receiveJewelChipMap;
+  3: required map<JewelType, i32> returnJewelChipMap;
+}
+
+struct ReceiveJewelChip {
+  1: required map<JewelType, i32> receiveJewelChipMap;
+  2: required map<JewelType, i32> returnJewelChipMap;
+}
+
+union ActionResult {
+  1: PurchaseCard purchaseCard,
+  2: ReserveCard reserveCard,
+  3: ReceiveJewelChip receiveJewelChip,
+}
 service SplendorAi
 {
   void hi()
