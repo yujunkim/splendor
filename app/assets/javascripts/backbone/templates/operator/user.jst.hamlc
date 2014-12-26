@@ -1,4 +1,4 @@
 %li.list-group-item.user{class: "#{"playing disabled" if @get("playing")}", "data-id" => @get("id")}
+  .thumbnail{style: "background-image: url(#{@get("photoUrl")})"}
   %span.name
-    %i.fa.fa-square.fa-fw{style: "color: #{@get("color")}"}
     = @get("name")

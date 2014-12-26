@@ -16,5 +16,5 @@ class BSplendor.Views.Noble.Base extends Backbone.View
     @$el.html @template @
 
   mousemoved: (e) ->
-    e.stopPropagation() unless @model.collection? && @model.collection.user?
+    e.stopPropagation() unless @model.collection? && @model.collection.player?
     game.trigger("gameChildHovered", e, @)

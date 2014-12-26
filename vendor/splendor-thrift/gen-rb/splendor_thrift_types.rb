@@ -26,12 +26,11 @@ module SplendorThrift
     VALID_VALUES = Set.new([FIRST, SECOND, THIRD]).freeze
   end
 
-  module ActionType
-    PURCHASE_CARD = 0
-    RESERVE_CARD = 1
-    RECEIVE_JEWEL_CHIP = 2
-    VALUE_MAP = {0 => "PURCHASE_CARD", 1 => "RESERVE_CARD", 2 => "RECEIVE_JEWEL_CHIP"}
-    VALID_VALUES = Set.new([PURCHASE_CARD, RESERVE_CARD, RECEIVE_JEWEL_CHIP]).freeze
+  module CardLocation
+    PACK = 0
+    EXHIBITION = 1
+    VALUE_MAP = {0 => "PACK", 1 => "EXHIBITION"}
+    VALID_VALUES = Set.new([PACK, EXHIBITION]).freeze
   end
 
   class Card
@@ -39,18 +38,14 @@ module SplendorThrift
     ID = 1
     CARDGRADE = 2
     REVEALED = 3
-    RESERVED = 4
-    USERID = 5
     JEWELTYPE = 6
     POINT = 7
     COSTS = 8
 
     FIELDS = {
-      ID => {:type => ::Thrift::Types::I32, :name => 'id'},
+      ID => {:type => ::Thrift::Types::STRING, :name => 'id'},
       CARDGRADE => {:type => ::Thrift::Types::I32, :name => 'cardGrade', :enum_class => ::SplendorThrift::CardGrade},
       REVEALED => {:type => ::Thrift::Types::BOOL, :name => 'revealed'},
-      RESERVED => {:type => ::Thrift::Types::BOOL, :name => 'reserved'},
-      USERID => {:type => ::Thrift::Types::I32, :name => 'userId', :optional => true},
       JEWELTYPE => {:type => ::Thrift::Types::I32, :name => 'jewelType', :optional => true, :enum_class => ::SplendorThrift::JewelType},
       POINT => {:type => ::Thrift::Types::I32, :name => 'point', :optional => true},
       COSTS => {:type => ::Thrift::Types::MAP, :name => 'costs', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}, :optional => true}
@@ -62,7 +57,6 @@ module SplendorThrift
       raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field id is unset!') unless @id
       raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field cardGrade is unset!') unless @cardGrade
       raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field revealed is unset!') if @revealed.nil?
-      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field reserved is unset!') if @reserved.nil?
       unless @cardGrade.nil? || ::SplendorThrift::CardGrade::VALID_VALUES.include?(@cardGrade)
         raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Invalid value of field cardGrade!')
       end
@@ -77,12 +71,10 @@ module SplendorThrift
   class JewelChip
     include ::Thrift::Struct, ::Thrift::Struct_Union
     ID = 1
-    USERID = 5
     JEWELTYPE = 6
 
     FIELDS = {
-      ID => {:type => ::Thrift::Types::I32, :name => 'id'},
-      USERID => {:type => ::Thrift::Types::I32, :name => 'userId', :optional => true},
+      ID => {:type => ::Thrift::Types::STRING, :name => 'id'},
       JEWELTYPE => {:type => ::Thrift::Types::I32, :name => 'jewelType', :enum_class => ::SplendorThrift::JewelType}
     }
 
@@ -102,13 +94,11 @@ module SplendorThrift
   class Noble
     include ::Thrift::Struct, ::Thrift::Struct_Union
     ID = 1
-    USERID = 5
     POINT = 7
     COSTS = 8
 
     FIELDS = {
-      ID => {:type => ::Thrift::Types::I32, :name => 'id'},
-      USERID => {:type => ::Thrift::Types::I32, :name => 'userId', :optional => true},
+      ID => {:type => ::Thrift::Types::STRING, :name => 'id'},
       POINT => {:type => ::Thrift::Types::I32, :name => 'point'},
       COSTS => {:type => ::Thrift::Types::MAP, :name => 'costs', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}, :optional => true}
     }
@@ -123,45 +113,21 @@ module SplendorThrift
     ::Thrift::Struct.generate_accessors self
   end
 
-  class User
+  class Player
     include ::Thrift::Struct, ::Thrift::Struct_Union
     ID = 1
-    ME = 2
+    ISME = 2
+    PURCHASEDCARDS = 3
+    RESERVEDCARDS = 4
+    JEWELCHIPS = 5
+    NOBLES = 6
 
     FIELDS = {
-      ID => {:type => ::Thrift::Types::I32, :name => 'id'},
-      ME => {:type => ::Thrift::Types::BOOL, :name => 'me'}
-    }
-
-    def struct_fields; FIELDS; end
-
-    def validate
-      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field id is unset!') unless @id
-      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field me is unset!') if @me.nil?
-    end
-
-    ::Thrift::Struct.generate_accessors self
-  end
-
-  class Game
-    include ::Thrift::Struct, ::Thrift::Struct_Union
-    ID = 1
-    CURRENTTURNUSERID = 2
-    ORDERUSERIDS = 3
-    WINNERID = 4
-    USERS = 5
-    CARDS = 6
-    JEWELCHIPS = 7
-    NOBLES = 8
-
-    FIELDS = {
-      ID => {:type => ::Thrift::Types::I32, :name => 'id'},
-      CURRENTTURNUSERID => {:type => ::Thrift::Types::I32, :name => 'currentTurnUserId'},
-      ORDERUSERIDS => {:type => ::Thrift::Types::SET, :name => 'orderUserIds', :element => {:type => ::Thrift::Types::I32}},
-      WINNERID => {:type => ::Thrift::Types::I32, :name => 'winnerId', :optional => true},
-      USERS => {:type => ::Thrift::Types::SET, :name => 'users', :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::User}},
-      CARDS => {:type => ::Thrift::Types::SET, :name => 'cards', :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::Card}},
-      JEWELCHIPS => {:type => ::Thrift::Types::SET, :name => 'jewelChips', :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::JewelChip}},
+      ID => {:type => ::Thrift::Types::STRING, :name => 'id'},
+      ISME => {:type => ::Thrift::Types::BOOL, :name => 'isMe'},
+      PURCHASEDCARDS => {:type => ::Thrift::Types::MAP, :name => 'purchasedCards', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::SET, :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::Card}}},
+      RESERVEDCARDS => {:type => ::Thrift::Types::SET, :name => 'reservedCards', :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::Card}},
+      JEWELCHIPS => {:type => ::Thrift::Types::MAP, :name => 'jewelChips', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::SET, :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::JewelChip}}},
       NOBLES => {:type => ::Thrift::Types::SET, :name => 'nobles', :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::Noble}}
     }
 
@@ -169,9 +135,31 @@ module SplendorThrift
 
     def validate
       raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field id is unset!') unless @id
-      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field currentTurnUserId is unset!') unless @currentTurnUserId
-      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field orderUserIds is unset!') unless @orderUserIds
-      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field users is unset!') unless @users
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field isMe is unset!') if @isMe.nil?
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field purchasedCards is unset!') unless @purchasedCards
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field reservedCards is unset!') unless @reservedCards
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field jewelChips is unset!') unless @jewelChips
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field nobles is unset!') unless @nobles
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class CenterField
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    CARDS = 1
+    JEWELCHIPS = 2
+    NOBLES = 3
+
+    FIELDS = {
+      CARDS => {:type => ::Thrift::Types::MAP, :name => 'cards', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::CardLocation}, :value => {:type => ::Thrift::Types::MAP, :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::CardGrade}, :value => {:type => ::Thrift::Types::SET, :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::Card}}}},
+      JEWELCHIPS => {:type => ::Thrift::Types::MAP, :name => 'jewelChips', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::SET, :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::JewelChip}}},
+      NOBLES => {:type => ::Thrift::Types::SET, :name => 'nobles', :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::Noble}}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
       raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field cards is unset!') unless @cards
       raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field jewelChips is unset!') unless @jewelChips
       raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field nobles is unset!') unless @nobles
@@ -180,30 +168,127 @@ module SplendorThrift
     ::Thrift::Struct.generate_accessors self
   end
 
-  class ActionResult
+  class Game
     include ::Thrift::Struct, ::Thrift::Struct_Union
-    ACTIONTYPE = 1
-    CARDID = 2
-    RECEIVEJEWELCHIPMAP = 3
-    RETURNJEWELCHIPMAP = 4
+    ID = 1
+    CENTERFIELD = 2
+    PLAYERS = 3
 
     FIELDS = {
-      ACTIONTYPE => {:type => ::Thrift::Types::I32, :name => 'actionType', :enum_class => ::SplendorThrift::ActionType},
-      CARDID => {:type => ::Thrift::Types::I32, :name => 'cardId', :optional => true},
-      RECEIVEJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'receiveJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}, :optional => true},
-      RETURNJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'returnJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}, :optional => true}
+      ID => {:type => ::Thrift::Types::STRING, :name => 'id'},
+      CENTERFIELD => {:type => ::Thrift::Types::STRUCT, :name => 'centerField', :class => ::SplendorThrift::CenterField},
+      PLAYERS => {:type => ::Thrift::Types::LIST, :name => 'players', :element => {:type => ::Thrift::Types::STRUCT, :class => ::SplendorThrift::Player}}
     }
 
     def struct_fields; FIELDS; end
 
     def validate
-      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field actionType is unset!') unless @actionType
-      unless @actionType.nil? || ::SplendorThrift::ActionType::VALID_VALUES.include?(@actionType)
-        raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Invalid value of field actionType!')
-      end
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field id is unset!') unless @id
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field centerField is unset!') unless @centerField
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field players is unset!') unless @players
     end
 
     ::Thrift::Struct.generate_accessors self
+  end
+
+  class PurchaseCard
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    CARDID = 1
+    NOBLEID = 2
+    RETURNJEWELCHIPMAP = 3
+
+    FIELDS = {
+      CARDID => {:type => ::Thrift::Types::STRING, :name => 'cardId'},
+      NOBLEID => {:type => ::Thrift::Types::STRING, :name => 'nobleId', :optional => true},
+      RETURNJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'returnJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field cardId is unset!') unless @cardId
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field returnJewelChipMap is unset!') unless @returnJewelChipMap
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class ReserveCard
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    CARDID = 1
+    RECEIVEJEWELCHIPMAP = 2
+    RETURNJEWELCHIPMAP = 3
+
+    FIELDS = {
+      CARDID => {:type => ::Thrift::Types::STRING, :name => 'cardId'},
+      RECEIVEJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'receiveJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}},
+      RETURNJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'returnJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field cardId is unset!') unless @cardId
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field receiveJewelChipMap is unset!') unless @receiveJewelChipMap
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field returnJewelChipMap is unset!') unless @returnJewelChipMap
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class ReceiveJewelChip
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    RECEIVEJEWELCHIPMAP = 1
+    RETURNJEWELCHIPMAP = 2
+
+    FIELDS = {
+      RECEIVEJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'receiveJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}},
+      RETURNJEWELCHIPMAP => {:type => ::Thrift::Types::MAP, :name => 'returnJewelChipMap', :key => {:type => ::Thrift::Types::I32, :enum_class => ::SplendorThrift::JewelType}, :value => {:type => ::Thrift::Types::I32}}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field receiveJewelChipMap is unset!') unless @receiveJewelChipMap
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field returnJewelChipMap is unset!') unless @returnJewelChipMap
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class ActionResult < ::Thrift::Union
+    include ::Thrift::Struct_Union
+    class << self
+      def purchaseCard(val)
+        ActionResult.new(:purchaseCard, val)
+      end
+
+      def reserveCard(val)
+        ActionResult.new(:reserveCard, val)
+      end
+
+      def receiveJewelChip(val)
+        ActionResult.new(:receiveJewelChip, val)
+      end
+    end
+
+    PURCHASECARD = 1
+    RESERVECARD = 2
+    RECEIVEJEWELCHIP = 3
+
+    FIELDS = {
+      PURCHASECARD => {:type => ::Thrift::Types::STRUCT, :name => 'purchaseCard', :class => ::SplendorThrift::PurchaseCard},
+      RESERVECARD => {:type => ::Thrift::Types::STRUCT, :name => 'reserveCard', :class => ::SplendorThrift::ReserveCard},
+      RECEIVEJEWELCHIP => {:type => ::Thrift::Types::STRUCT, :name => 'receiveJewelChip', :class => ::SplendorThrift::ReceiveJewelChip}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+      raise(StandardError, 'Union fields are not set.') if get_set_field.nil? || get_value.nil?
+    end
+
+    ::Thrift::Union.generate_accessors self
   end
 
 end

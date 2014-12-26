@@ -4,7 +4,7 @@ namespace rb splendorThrift
 */
 // This is also a valid comment
 
-typedef i32 id
+typedef string id
 
 enum JewelType {
   DIAMOND,
@@ -21,18 +21,15 @@ enum CardGrade {
   THIRD
 }
 
-enum ActionType {
-  PURCHASE_CARD,
-  RESERVE_CARD,
-  RECEIVE_JEWEL_CHIP,
+enum CardLocation {
+  PACK,
+  EXHIBITION
 }
 
 struct Card {
   1: required id id;
   2: required CardGrade cardGrade;
   3: required bool revealed;
-  4: required bool reserved;
-  5: optional id userId;
   6: optional JewelType jewelType;
   7: optional i32 point;
   8: optional map<JewelType, i32> costs;
@@ -40,41 +37,59 @@ struct Card {
 
 struct JewelChip {
   1: required id id;
-  5: optional id userId;
   6: required JewelType jewelType;
 }
 
 struct Noble {
   1: required id id;
-  5: optional id userId;
   7: required i32 point;
   8: optional map<JewelType, i32> costs;
 }
 
-struct User {
+struct Player {
   1: required id id;
-  2: required bool me;
+  2: required bool isMe;
+  3: required map<JewelType, set<Card>> purchasedCards;
+  4: required set<Card> reservedCards;
+  5: required map<JewelType, set<JewelChip>> jewelChips;
+  6: required set<Noble> nobles;
+}
+
+struct CenterField {
+  1: required map<CardLocation, map<CardGrade, set<Card>>> cards;
+  2: required map<JewelType, set<JewelChip>> jewelChips;
+  3: required set<Noble> nobles;
 }
 
 struct Game {
   1: required id id;
-  2: required id currentTurnUserId;
-  3: required set<id> orderUserIds;
-  4: optional id winnerId;
-  5: required set<User> users;
-  6: required set<Card> cards;
-  7: required set<JewelChip> jewelChips;
-  8: required set<Noble> nobles;
+  2: required CenterField centerField;
+  3: required list<Player> players;
 }
 
-struct ActionResult {
-  1: required ActionType actionType;
-  2: optional id cardId;
-  3: optional map<JewelType, i32> receiveJewelChipMap;
-  4: optional map<JewelType, i32> returnJewelChipMap;
+struct PurchaseCard {
+  1: required id cardId,
+  2: optional id nobleId,
+  3: required map<JewelType, i32> returnJewelChipMap;
 }
 
-service Player
+struct ReserveCard {
+  1: required id cardId,
+  2: required map<JewelType, i32> receiveJewelChipMap;
+  3: optional map<JewelType, i32> returnJewelChipMap;
+}
+
+struct ReceiveJewelChip {
+  1: required map<JewelType, i32> receiveJewelChipMap;
+  2: optional map<JewelType, i32> returnJewelChipMap;
+}
+
+union ActionResult {
+  1: PurchaseCard purchaseCard,
+  2: ReserveCard reserveCard,
+  3: ReceiveJewelChip receiveJewelChip
+}
+service SplendorAi
 {
   void hi()
   ActionResult play(1:Game game)

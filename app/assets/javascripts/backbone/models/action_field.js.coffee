@@ -51,17 +51,17 @@ class BSplendor.Models.ActionField extends Backbone.Model
     @cardList.models.forEach (card) ->
       card.collection.remove(card)
       if card.get("userId") && card.get("reserved")
-        game.users[card.get("userId")].reservationCardList.add(card)
+        game.users[card.get("userId")].reservedCards.add(card)
       else
-        game.centerField.exhibition[card.get("cardGrade")].add(card)
+        game.centerField.cards.exhibition[card.get("cardGrade")].add(card)
     _(@receiveJewelChipList.models.length).times () =>
       tmpJewelChip = @receiveJewelChipList.models[0]
       tmpJewelChip.collection.remove(tmpJewelChip)
-      game.centerField.jewelChip[tmpJewelChip.get("jewelType")].add(tmpJewelChip)
+      game.centerField.jewelChips[tmpJewelChip.get("jewelType")].add(tmpJewelChip)
     _(@returnJewelChipList.models.length).times () =>
       tmpJewelChip = @returnJewelChipList.models[0]
       tmpJewelChip.collection.remove(tmpJewelChip)
-      game.me.jewelChip[tmpJewelChip.get("jewelType")].add(tmpJewelChip)
+      game.me.jewelChips[tmpJewelChip.get("jewelType")].add(tmpJewelChip)
     @collectionChanged()
 
   pushCardList: (card, type) =>
@@ -74,7 +74,7 @@ class BSplendor.Models.ActionField extends Backbone.Model
 
   popReceive: (jewelChip) ->
     jewelChip.collection.remove(jewelChip)
-    game.centerField.jewelChip[jewelChip.get("jewelType")].add(jewelChip)
+    game.centerField.jewelChips[jewelChip.get("jewelType")].add(jewelChip)
     if @receiveJewelChipList.models.length == 0
       @reset()
 
@@ -84,7 +84,7 @@ class BSplendor.Models.ActionField extends Backbone.Model
 
   popReturn: (jewelChip) ->
     jewelChip.collection.remove(jewelChip)
-    game.me.jewelChip[jewelChip.get("jewelType")].add(jewelChip)
+    game.me.jewelChips[jewelChip.get("jewelType")].add(jewelChip)
     @collectionChanged()
 
   changeType: (type) =>
@@ -110,10 +110,12 @@ class BSplendor.Models.ActionField extends Backbone.Model
 
   serialize: =>
     {
-      actionType: @get("type")
-      cardId: @getIds(@cardList)[0]
-      receiveJewelChipMap: @getJewelChipMap(@receiveJewelChipList)
-      returnJewelChipMap: @getJewelChipMap(@returnJewelChipList)
+      method: @get("type")
+      d: {
+        cardId: @getIds(@cardList)[0]
+        receiveJewelChipMap: @getJewelChipMap(@receiveJewelChipList)
+        returnJewelChipMap: @getJewelChipMap(@returnJewelChipList)
+      }
     }
 
   action: =>

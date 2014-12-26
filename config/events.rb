@@ -1,6 +1,8 @@
 WebsocketRails::EventMap.describe do
 
   [
+    :hi,
+    :login,
     :setting,
     :update_users,
     :start_game,

@@ -14,21 +14,21 @@ class BSplendor.Views.Card.Base extends Backbone.View
 
   initialize: () ->
     @model.on("change", @render, @)
-    @model.on("purchasable-user-change", @changePurchasableUserClass, @)
+    @model.on("purchasable-player-change", @changePurchasablePlayerClass, @)
 
   render: ->
     @$el.addClass("card-view-#{@collection.indexOf(@model)}") if @collection?
     @$el.html @template @
     @$el.find(".card").addClass("revealed") if @model.get("revealed")
-    @changePurchasableUserClass()
+    @changePurchasablePlayerClass()
 
-  changePurchasableUserClass: =>
+  changePurchasablePlayerClass: =>
     @$el.find(".card").removeClass (idx, cls) ->
-      cls.match("purchasable-user")
-    @model.purchasableUser.forEach (user) =>
-      @$el.find(".card").addClass("purchasable-user-#{user.get("id")}")
-      if user.get("me")
-        @$el.find(".card").addClass("purchasable-user-me")
+      cls.match("purchasable-player")
+    @model.purchasablePlayer.forEach (player) =>
+      @$el.find(".card").addClass("purchasable-player-#{player.get("id")}")
+      if player.get("isMe")
+        @$el.find(".card").addClass("purchasable-player-me")
 
   cancel: (e) =>
     e.stopPropagation()
@@ -43,7 +43,7 @@ class BSplendor.Views.Card.Base extends Backbone.View
     @model.reserve()
 
   mousemoved: (e) ->
-    e.stopPropagation() unless @model.collection? && @model.collection.user?
+    e.stopPropagation() unless @model.collection? && @model.collection.player?
     game.trigger("gameChildHovered", e, @)
 
 

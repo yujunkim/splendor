@@ -32,8 +32,8 @@ class BSplendor.Views.ZoomField.Base extends Backbone.View
       when "packCardList"
         collection = @model.get("instance")
         @$el.append(JST["backbone/templates/zoom_field/pack_card_list"](collection))
-      when "user"
+      when "player"
         model = @model.get("instance")
-        @$el.append(JST["backbone/templates/zoom_field/user"](model))
+        @$el.append(JST["backbone/templates/zoom_field/player"](model))
 
 

@@ -1,5 +1,5 @@
 .username.center-center.font-size-2{style: "color: #{@get("color")}"}
-  = @get("name")
+  = @name()
 .jewel-stats
   - for jewelType in ["diamond", "sapphire", "emerald", "ruby", "onyx", "gold"]
     .jewel-stat

@@ -1,28 +1,20 @@
 #chat
   .panel.panel-primary
     .panel-heading
-      %span.fa.fa-send
+      %span.fa.fa-send.fa-2x
       .btn-group.pull-right.operation-dropdown
-        %button.btn.btn-default.btn-xs.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
-          %span.fa.fa-cog.fa-spin
+        %span.cursor-pointer.fa.fa-users.fa-fw.fa-2x.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
+        %ul.user-list.dropdown-menu.slidedown
+          = @usersTemplate()
+      .btn-group.pull-right.operation-dropdown
+        %img.cursor-pointer.dropdown-toggle{src: "http://graph.facebook.com/#{facebookUser.id}/picture?type=square", "data-toggle" => "dropdown", :type => "button"}
         %ul.dropdown-menu.slidedown
-          %li#recolor
-            %a{href: "#"}
-              %i.fa.fa-picture-o.fa-fw
-              Recolor
+          %li.dropdown-header
+            = facebookUser.name
           %li#robotify
             %a{href: "#"}
               %i.fa.fa-android.fa-fw
               Robotify
-          %li#rename
-            %a{href: "#"}
-              %i.fa.fa-pencil.fa-fw
-              Rename
-      .btn-group.pull-right.operation-dropdown
-        %button.btn.btn-default.btn-xs.dropdown-toggle{"data-toggle" => "dropdown", :type => "button"}
-          %span.fa.fa-users
-        %ul.user-list.dropdown-menu.slidedown
-          = @usersTemplate()
     .panel-body
     .panel-footer
       .input-group
@@ -30,3 +22,4 @@
         %span.input-group-btn
           %button#send.btn.btn-warning.btn-sm
             Send
+

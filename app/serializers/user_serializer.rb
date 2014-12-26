@@ -1,21 +1,15 @@
 class UserSerializer < Thriftify
   attributes :id,
              :name,
-             :color,
-             :robot,
-             :lastGameId,
-             :me,
-             :playing
+             :photoUrl,
+             :isMe,
+             :isRobot
 
-  def me
+  def photoUrl
+    object.photo_url
+  end
+
+  def isMe
     !!(options[:scope] && options[:scope].id == id)
-  end
-
-  def lastGameId
-    object.games.last.try(:id)
-  end
-
-  def playing
-    !!options[:playing]
   end
 end

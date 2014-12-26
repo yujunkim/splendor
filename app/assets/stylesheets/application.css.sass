@@ -17,6 +17,39 @@
  * v2.0 | 20110126
  * License: none (public domain)
 
+.full
+  width: 100%
+  height: 100%
+
+.social
+  &:hover
+    -webkit-transform: scale(1.1)
+    -moz-transform: scale(1.1)
+    -o-transform: scale(1.1)
+  -webkit-transform: scale(0.8)
+  /* Browser Variations:
+  -moz-transform: scale(0.8)
+  -o-transform: scale(0.8)
+  -webkit-transition-duration: 0.5s
+  -moz-transition-duration: 0.5s
+  -o-transition-duration: 0.5s
+
+/*
+ *  Only Needed in Multi-Coloured Variation
+
+.social-fb:hover
+  color: #3B5998
+
+.social-tw:hover
+  color: #4099FF
+
+.social-gp:hover
+  color: #d34836
+
+.social-em:hover
+  color: #f39c12
+
+
 @for $i from 1 through 10
   .font-size-#{$i}
     font-size: #{$i}vw
@@ -32,6 +65,9 @@
   -webkit-justify-content: center // Safari 6.1+
   align-items: center
   -webkit-align-items: center // Safari 6.1+
+
+.cursor-pointer
+  cursor: pointer
 
 .color-diamond
   background-color: white
@@ -87,6 +123,15 @@ body
         border: none
         padding: 5%
         color: black
+        .thumbnail
+          padding: 0
+          margin: 0
+          left: 0
+          width: 20px
+          height: 20px
+          background-size: cover
+          float: left
+          margin-right: 10px
     .panel
       margin-bottom: 0
     .chat-list
@@ -105,6 +150,7 @@ body
           left: 0
           width: 40px
           height: 40px
+          background-size: cover
         .chat-body
           margin-left: 50px
           p
@@ -116,6 +162,12 @@ body
     .slidedown .fa, .panel-heading > .fa
       margin-right: 5px
 
+    .panel-heading
+      .operation-dropdown
+        img
+          width: 2em
+          margin-right: 1.5em
+          border-radius: 0.5em
     .panel-body
       overflow-y: scroll
       height: calc(100% - 92px)
@@ -156,6 +208,15 @@ body
               .list-group-item
                 cursor: pointer
                 padding: 5%
+                .thumbnail
+                  padding: 0
+                  margin: 0
+                  left: 0
+                  width: 10%
+                  background-size: cover
+                  float: left
+                  margin-right: 10px
+                  padding-bottom: 10%
                 &.playing
                   pointer-events: none
                 &:hover
@@ -258,7 +319,7 @@ body
         background-repeat: no-repeat
         background-position: center center
 
-      &.purchasable-user-me
+      &.purchasable-player-me
         .hover-view
           .reserve, .purchase
             width: 50%
@@ -468,7 +529,7 @@ body
 
 
 .game
-  .user
+  .player
     position: absolute
     width: 54%
     height: 30%
@@ -558,7 +619,7 @@ body
       .card-list
         .card-view.hovered
           .card-padder
-            .card:not(.purchasable-user-me)
+            .card:not(.purchasable-player-me)
               .hover-view
                 display: none
     &.current-turn
@@ -741,13 +802,13 @@ body
       cursor: pointer
       &:hover
         color: coral
-  &.game-3users
-    .user.left
+  &.game-3players
+    .player.left
       top: 25%
     .zoom-field
       top: 70%
   &.my-view
-    .user.others
+    .player.others
       display: none
     .zoom-field
       top: 10%
@@ -764,7 +825,7 @@ body
       left: 0
       width: 75%
       height: 65%
-    .user.me
+    .player.me
       width: 73%
       height: 37%
       top: 64%

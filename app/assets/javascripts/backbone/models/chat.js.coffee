@@ -11,6 +11,13 @@ class BSplendor.Models.Chat extends Backbone.Model
     else
       @get("userColor")
 
+  thumbnailUrl: () ->
+    if @get("user")
+      @set(userPhotoUrl: @get("user").get("photoUrl"))
+      @get("user").get("photoUrl")
+    else
+      @get("userPhotoUrl")
+
   username: () ->
     if @get("user")
       @set(userName: @get("user").get("name"))

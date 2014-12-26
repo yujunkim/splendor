@@ -7,8 +7,6 @@ class BSplendor.Views.Operator.Base extends Backbone.View
     "click #start": "startGame"
     "click #cancel-start": "cancelStartGame"
     "click #restart": "restartGame"
-    "click #rename": "rename"
-    "click #recolor": "recolor"
     "click #robotify": "robotify"
     "keypress #message": "messageKeypressed"
     "click .list-group .list-group-item": "toggleActive"
@@ -48,19 +46,12 @@ class BSplendor.Views.Operator.Base extends Backbone.View
   restartGame: ->
     splendorController.dispatcher.trigger 'restart_game'
 
-  rename: ->
-    name = prompt("set rename", Splendor.Me.get("name"))
-    splendorController.dispatcher.trigger 'setting', username: name if name?
-
-  recolor: ->
-    splendorController.dispatcher.trigger 'setting', color: true
-
   robotify: ->
     home = null
-    if !Splendor.Me.get("robot")
+    if !Splendor.Me.get("isRobot")
       home = prompt("set robot's home")
       home = null if home == ""
-    splendorController.dispatcher.trigger 'setting', robotify: !Splendor.Me.get("robot"), home: home
+    splendorController.dispatcher.trigger 'setting', robotify: !Splendor.Me.get("isRobot"), home: home
 
   sendMessage: (e) =>
     e.preventDefault()
@@ -75,6 +66,7 @@ class BSplendor.Views.Operator.Base extends Backbone.View
       collection: @model.chatList,
     chatListView.render()
     @$el.find(".panel-body").append(chatListView.el)
+    @$el.find("#robotify").addClass("active") if Splendor.Me && Splendor.Me.get("isRobot")
 
   usersTemplate: ()->
     el = []
@@ -90,6 +82,9 @@ class BSplendor.Views.Operator.Base extends Backbone.View
     if @$el? && @$el.find("#game-door")?
       @$el.find("#game-door .user-list.user-list-base").empty()
       @$el.find("#game-door .user-list.user-list-base").append(@usersTemplate())
+
+    @$el.find("#robotify").removeClass("active")
+    @$el.find("#robotify").addClass("active") if Splendor.Me && Splendor.Me.get("isRobot")
 
   toggleActive: (e)->
     $(e.currentTarget).toggleClass "active"
