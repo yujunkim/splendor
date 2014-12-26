@@ -64,7 +64,7 @@ struct CenterField {
 struct Game {
   1: required id id;
   2: required CenterField centerField;
-  3: required set<Player> players;
+  3: required list<Player> players;
 }
 
 struct PurchaseCard {
@@ -76,18 +76,18 @@ struct PurchaseCard {
 struct ReserveCard {
   1: required id cardId,
   2: required map<JewelType, i32> receiveJewelChipMap;
-  3: required map<JewelType, i32> returnJewelChipMap;
+  3: optional map<JewelType, i32> returnJewelChipMap;
 }
 
 struct ReceiveJewelChip {
   1: required map<JewelType, i32> receiveJewelChipMap;
-  2: required map<JewelType, i32> returnJewelChipMap;
+  2: optional map<JewelType, i32> returnJewelChipMap;
 }
 
 union ActionResult {
   1: PurchaseCard purchaseCard,
   2: ReserveCard reserveCard,
-  3: ReceiveJewelChip receiveJewelChip,
+  3: ReceiveJewelChip receiveJewelChip
 }
 service SplendorAi
 {

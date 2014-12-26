@@ -26,23 +26,27 @@ class Robot
 
       params = action_result.as_json
 
-      params["actionType"] = ActionType[params["actionType"]].camelize(:lower)
+      method = params["setfield"]
+      data = params["value"]
 
-      if params["receiveJewelChipMap"]
-        params["receiveJewelChipMap"] = Hash[params["receiveJewelChipMap"].map do |jewel_type, cost|
+      if data["receiveJewelChipMap"]
+        data["receiveJewelChipMap"] = Hash[data["receiveJewelChipMap"].map do |jewel_type, cost|
           [JewelType[jewel_type.to_i], cost.to_i]
         end]
       end
 
-      if params["returnJewelChipMap"]
-        params["returnJewelChipMap"] = Hash[params["returnJewelChipMap"].map do |jewel_type, cost|
+      if data["returnJewelChipMap"]
+        data["returnJewelChipMap"] = Hash[data["returnJewelChipMap"].map do |jewel_type, cost|
           [JewelType[jewel_type.to_i], cost.to_i]
         end]
       end
 
       if action_result
         uri = URI.parse("http://#{game.host_with_port}/games/#{game.id}/robot_play")
-        uri.query = params.to_query
+        uri.query = {
+          method: method,
+          d: data
+        }.to_query
         10.times do
           begin
             uri.open

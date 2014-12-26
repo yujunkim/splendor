@@ -12,7 +12,7 @@ class BSplendor.Models.Card extends Backbone.Model
 
   purchase: ->
     if player = @collection.player
-      if player.get("me") && @collection.reservation
+      if player.get("isMe") && @collection.reservation
         game.purchaseCard(@)
     else if @collection.type != "pack"
       game.purchaseCard(@)

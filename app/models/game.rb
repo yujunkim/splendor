@@ -98,31 +98,37 @@ class Game
   end
 
   def action(player, options)
-    def options_transform(options)
-      if options[:receiveJewelChipMap]
-        options[:receiveJewelChipMap] = Hash[options[:receiveJewelChipMap].map do |key, value|
+    def options_transform(data)
+      if data[:receiveJewelChipMap]
+        data[:receiveJewelChipMap] = Hash[data[:receiveJewelChipMap].map do |key, value|
           [key.to_sym, value.to_i]
         end]
       end
-      if options[:returnJewelChipMap]
-        options[:returnJewelChipMap] = Hash[options[:returnJewelChipMap].map do |key, value|
+      if data[:returnJewelChipMap]
+        data[:returnJewelChipMap] = Hash[data[:returnJewelChipMap].map do |key, value|
           [key.to_sym, value.to_i]
         end]
       end
-      options
+      data
     end
-    options = options_transform(options)
-    method = options[:actionType].underscore
+    data = options_transform((options[:d] || {}))
+    method = options[:method].underscore
 
     return unless ["purchase_card", "reserve_card", "receive_jewel_chip"].include?(method)
-    if self.validation(method, player, options)
-      action_opts = self.send(method.underscore, player, options)
+    if self.validation(method, player, data)
+      puts "validation passed"
+      action_opts = self.send(method, player, data)
+      puts "sended"
       self.after_action(player, method, action_opts)
     else
       binding.pry
       Rails.logger.info(player)
       Rails.logger.info(options)
     end
+
+  rescue Exception => e
+    binding.pry
+
   end
 
   def validation(type, player, data)
@@ -138,7 +144,13 @@ class Game
       card = dic[:cards][data[:cardId]]
       able &&= player.purchase_validation(card, data[:returnJewelChipMap])
     when "reserve_card"
-      able &&= player.jewel_chips.values.flatten.count + jewel_chip_count(data[:receiveJewelChipMap]) <= 10
+      able &&= (
+        player.jewel_chips.values.flatten.count +
+        jewel_chip_types(data[:receiveJewelChipMap]).count -
+        jewel_chip_types(data[:returnJewelChipMap]).count <= 10
+      )
+
+      able &&= player.reserved_cards.count <= 2
     when "receive_jewel_chip"
       able &&= (
         player.jewel_chips.values.flatten.count +
@@ -234,7 +246,7 @@ class Game
     center_field.remove(reserved_card)
     player.reserve(reserved_card)
 
-    revealed_card = center_field.pickup_unrevealed_card(purchased_card.card_grade)
+    revealed_card = center_field.pickup_unrevealed_card(reserved_card.card_grade)
 
     received_jewel_chips = player.receive(self, data[:receiveJewelChipMap])
 

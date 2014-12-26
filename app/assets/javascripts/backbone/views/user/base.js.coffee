@@ -8,7 +8,7 @@ class BSplendor.Views.User.Base extends Backbone.View
 
   initialize: () ->
     @$el.addClass(@options.position)
-    if @model.get("me")
+    if @model.get("isMe")
       @$el.addClass("me")
     else
       @$el.addClass("others")

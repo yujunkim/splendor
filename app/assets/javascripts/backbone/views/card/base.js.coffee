@@ -27,7 +27,7 @@ class BSplendor.Views.Card.Base extends Backbone.View
       cls.match("purchasable-player")
     @model.purchasablePlayer.forEach (player) =>
       @$el.find(".card").addClass("purchasable-player-#{player.get("id")}")
-      if player.get("me")
+      if player.get("isMe")
         @$el.find(".card").addClass("purchasable-player-me")
 
   cancel: (e) =>

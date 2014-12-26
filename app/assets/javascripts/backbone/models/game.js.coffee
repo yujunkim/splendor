@@ -61,7 +61,7 @@ class BSplendor.Models.Game extends Backbone.Model
 
     if @playerTurn(@me) && reserveCardValidation()
       @actionField.changeType("reserveCard")
-      goldJewelChip = @centerField.jewelChip["gold"].first()
+      goldJewelChip = @centerField.jewelChips["gold"].first()
       @actionField.pushReceive(goldJewelChip) if goldJewelChip
       @actionField.pushCardList(card)
 
@@ -75,7 +75,7 @@ class BSplendor.Models.Game extends Backbone.Model
       able &&= receiveJewelChipList.length < 3
       able &&= (@me.totalJewelChipCount() + receiveJewelChipList.length) < 10
       if able && receiveJewelChipList.length == 1 && wantJewelType == receiveJewelChipList.models[0].get("jewelType")
-        able &&= @centerField.jewelChip[wantJewelType].length > 3
+        able &&= @centerField.jewelChips[wantJewelType].length > 3
       if able && receiveJewelChipList.length == 2
         jewelChipTypes = _.map receiveJewelChipList.models, (j) ->
           j.get("jewelType")
@@ -98,6 +98,9 @@ class BSplendor.Models.Game extends Backbone.Model
     player = @dic.players[winnerId]
     player.set(winner: true)
     game.set(winnerId: winnerId)
+    @resetCardPurchasable()
+    @clearAlertTimeout()
+    @clearRobotTimeout()
     @statField = new BSplendor.Models.StatField(game: @)
     @trigger("game.over")
 
@@ -175,7 +178,7 @@ class BSplendor.Models.Game extends Backbone.Model
 
   setCardPurchasable: () =>
     @players.forEach (player) =>
-      _.each @centerField.exhibition, (collection, level) ->
+      _.each @centerField.cards.exhibition, (collection, level) ->
         collection.models.forEach (card) ->
           if player.purchasable(card)
             card.setPurchasablePlayer(player)
@@ -184,7 +187,7 @@ class BSplendor.Models.Game extends Backbone.Model
           card.setPurchasablePlayer(player)
 
   resetCardPurchasable: ()=>
-    _.each @centerField.exhibition, (collection, level) ->
+    _.each @centerField.cards.exhibition, (collection, level) ->
       collection.models.forEach (card) ->
         card.resetPurchasablePlayer()
     @players.forEach (player) ->

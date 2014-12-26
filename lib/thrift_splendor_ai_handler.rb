@@ -78,27 +78,32 @@ class ThriftSplendorAiHandler
     game.centerField.cards[SplendorThrift::CardLocation::EXHIBITION].each do |card_grade, cards|
       cards.each do |card|
         if purchasable?(me, card)
-          action_result.actionType = SplendorThrift::ActionType::PURCHASE_CARD
-          action_result.cardId = card.id
-          action_result.returnJewelChipMap = actual_cost(me, card)
+          purchaseCard = SplendorThrift::PurchaseCard.new
+          purchaseCard.cardId = card.id
+          purchaseCard.returnJewelChipMap = actual_cost(me, card)
+
+          action_result.purchaseCard = purchaseCard
           break
         end
       end
-      break if action_result.actionType
+      break if action_result.purchaseCard rescue false
     end
 
-    if action_result.actionType.nil?
-      action_result.actionType = SplendorThrift::ActionType::RECEIVE_JEWEL_CHIP
-      action_result.receiveJewelChipMap = sample_receive_jewel_chip_map(game)
+    unless (action_result.purchaseCard rescue false)
+      receiveJewelChip = SplendorThrift::ReceiveJewelChip.new
+
+      receiveJewelChip.receiveJewelChipMap = sample_receive_jewel_chip_map(game)
 
       after_receive_jewel_count = me.jewelChips.values.flatten.count +
-        action_result.receiveJewelChipMap.map{|jewel_chip, count| count}
+        receiveJewelChip.receiveJewelChipMap.map{|jewel_chip, count| count}
                                          .inject{|sum,x| sum + x }.to_i
 
       if after_receive_jewel_count > 10
-        action_result.returnJewelChipMap =
+        receiveJewelChip.returnJewelChipMap =
           sample_return_jewel_chip_map(me, (after_receive_jewel_count - 10))
       end
+
+      action_result.receiveJewelChip = receiveJewelChip
     end
 
     action_result

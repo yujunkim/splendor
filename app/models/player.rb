@@ -74,7 +74,7 @@ class Player
   end
 
   def reserve(card)
-    reserved_card << card
+    self.reserved_cards << card
   end
 
   def receive(game, jewel_chip_map)
@@ -162,7 +162,7 @@ class Player
     gold_count = jewel_chip_map[:gold].to_i
     actual_cost(card).each do |jewel_type, cost|
       return unless able
-      exist_count = jewel_chip_map[jewel_type]
+      exist_count = jewel_chip_map[jewel_type].to_i
       if cost > exist_count + gold_count
         able = false
       else

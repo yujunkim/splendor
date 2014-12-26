@@ -6,7 +6,6 @@ class SplendorWebsocketController < WebsocketRails::BaseController
     broadcast_message ev, userId: current_user.id,
                           userName: current_user.name,
                           userPhotoUrl: current_user.photo_url,
-                          userColor: current_user.color,
                           received: Time.now.strftime("%Y-%m-%d %H:%M:%S"),
                           text: ERB::Util.html_escape(msg)
   end
@@ -64,7 +63,7 @@ class SplendorWebsocketController < WebsocketRails::BaseController
       end
     end
     game.host_with_port = request.host_with_port
-    game.run if game.current_turn_user.robot
+    #game.run if game.players.first.is_robot
   end
 
   def restart_game
@@ -73,8 +72,6 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   end
 
   def new_message
-    puts current_user.color
-    puts current_user.as_json
     user_msg :new_message, message.dup
   end
 
@@ -84,9 +81,8 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   #   d: ...
   # }
   def action
-    game = Game.find(message[:gameId])
-    game.request = request
-    game.action(current_user, message)
+    game = Game.find_by_id(message[:gameId])
+    game.action(game.players.first, message)
   end
 
   def login

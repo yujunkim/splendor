@@ -2,7 +2,8 @@ class UserSerializer < Thriftify
   attributes :id,
              :name,
              :photoUrl,
-             :isMe
+             :isMe,
+             :isRobot
 
   def photoUrl
     object.photo_url

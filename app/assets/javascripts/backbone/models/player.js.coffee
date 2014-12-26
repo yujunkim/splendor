@@ -39,7 +39,7 @@ class BSplendor.Models.Player extends Backbone.Model
     @get("reservedCards").forEach (card) =>
       card = new BSplendor.Models.Card(card)
       game.dic.cards[card.get("id")] = card
-      @reservedCards[jewelType].add(card)
+      @reservedCards.add(card)
 
     @get("nobles").forEach (noble) =>
       noble = new BSplendor.Models.Noble(noble)

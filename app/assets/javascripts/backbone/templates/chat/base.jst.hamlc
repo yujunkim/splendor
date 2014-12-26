@@ -1,4 +1,3 @@
--#%li.clearfix{class: "#{if @model.me() then "me"}", style: "color: #{@model.get("userColor")}"}
 .thumbnail{style: "background-image: url(#{@model.thumbnailUrl()})"}
 .chat-body.clearfix
   .header

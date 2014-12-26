@@ -11,10 +11,6 @@
         %ul.dropdown-menu.slidedown
           %li.dropdown-header
             = facebookUser.name
-          %li#recolor
-            %a{href: "#"}
-              %i.fa.fa-picture-o.fa-fw
-              Recolor
           %li#robotify
             %a{href: "#"}
               %i.fa.fa-android.fa-fw

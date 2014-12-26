@@ -16,10 +16,10 @@ window.fbAsyncInit = ->
     xfbml: true
     version: "v2.2"
 
-  checkLoginState()
+  window.checkLoginState()
 
 # This is called with the results from from FB.getLoginStatus().
-statusChangeCallback = (response) ->
+window.statusChangeCallback = (response) ->
   console.log "statusChangeCallback"
   console.log response
 
@@ -34,19 +34,17 @@ statusChangeCallback = (response) ->
   else if response.status is "not_authorized"
 
     # The person is logged into Facebook, but not your app.
-    document.getElementById("status").innerHTML = "Please log " + "into this app."
   else
 
     # The person is not logged into Facebook, so we're not sure if
     # they are logged into this app or not.
-    document.getElementById("status").innerHTML = "Please log " + "into Facebook."
 
 # This function is called when someone finishes with the Login
 # Button.  See the onlogin handler attached to it in the sample
 # code below.
-checkLoginState = ->
+window.checkLoginState = ->
   FB.getLoginStatus (response) ->
-    statusChangeCallback response
+    window.statusChangeCallback response
 
 # enable cookies to allow the server to access
 # the session
@@ -71,6 +69,10 @@ testAPI = ->
   console.log "Welcome!  Fetching your information.... "
   FB.api "/me", (response) ->
     window.facebookUser = response
-    $("#status").append("Thanks for logging in, " + response.name + "!")
-    $("#status").append("<image src='http://graph.facebook.com/#{response.id}/picture?type=square'/>")
     window.initOperator()
+
+$ ->
+  $("#facebook-login").click ->
+    FB.login ((response) ->
+      window.checkLoginState()
+    ), scope: "public_profile,email"
