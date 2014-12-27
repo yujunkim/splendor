@@ -51,7 +51,6 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   #   robot_count: 0
   # }
   def start_game
-    #binding.pry
     game = Game.new(message)
     return unless game
     users = game.players.map(&:user).compact
@@ -99,7 +98,7 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   end
 
   def client_disconnected
-    #update_users
-    #user_msg :new_message, "left chat room"
+    update_users
+    user_msg :new_message, "left chat room"
   end
 end

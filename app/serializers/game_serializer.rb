@@ -2,7 +2,8 @@ class GameSerializer < Thriftify
   attributes :id,
              :winner,
              :players,
-             :centerField
+             :centerField,
+             :turnCount
 
   def players
     object.players.map do |player|

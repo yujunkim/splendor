@@ -15,6 +15,7 @@ class BSplendor.Models.Game extends Backbone.Model
 
   refreshData: (game) =>
     @id = game.id
+    @turnCount = game.turnCount
     game.players.forEach (playerHash) =>
       user = null
       if playerHash.user
@@ -75,7 +76,7 @@ class BSplendor.Models.Game extends Backbone.Model
       able &&= receiveJewelChipList.length < 3
       able &&= (@me.totalJewelChipCount() + receiveJewelChipList.length) < 10
       if able && receiveJewelChipList.length == 1 && wantJewelType == receiveJewelChipList.models[0].get("jewelType")
-        able &&= @centerField.jewelChips[wantJewelType].length > 3
+        able &&= @centerField.jewelChips[wantJewelType].length > 2
       if able && receiveJewelChipList.length == 2
         jewelChipTypes = _.map receiveJewelChipList.models, (j) ->
           j.get("jewelType")
@@ -109,6 +110,8 @@ class BSplendor.Models.Game extends Backbone.Model
     @clearAlertTimeout()
     @clearRobotTimeout()
     player = @dic.players[data.playerId]
+    @turnCount = game.turnCount
+    $("#turn-count").html(data.turnCount)
 
     if data.purchasedCard && purchasedCard = @dic.cards[data.purchasedCard.id]
       purchasedCard.updateAttributes(data.purchasedCard)

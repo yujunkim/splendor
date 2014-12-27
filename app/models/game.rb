@@ -19,7 +19,8 @@ class Game
   attr_accessor :id
 
   attr_accessor :host_with_port,
-                :runner_count
+                :runner_count,
+                :action_count
 
   alias_method :centerField, :center_field
 
@@ -45,6 +46,7 @@ class Game
 
     self.id = Forgery('basic').text
     self.runner_count = 0
+    self.action_count = 0
     Splendor::Application::Record[:game][id] = self
 
     options[:robot_count] ||= 0
@@ -83,6 +85,12 @@ class Game
     Noble.generate(self)
   end
 
+  def turn_count
+    1 + (action_count / players.count)
+  end
+
+  alias_method :turnCount, :turn_count
+
   def run
     self.runner_count -= 1
     self.runner_count = 0 if self.runner_count < 0
@@ -118,6 +126,7 @@ class Game
     if self.validation(method, player, data)
       puts "validation passed"
       action_opts = self.send(method, player, data)
+      self.action_count += 1
       puts "sended"
       self.after_action(player, method, action_opts)
     else
@@ -188,7 +197,7 @@ class Game
   end
 
   def game_over(player)
-    return false if player.id != players.map(&:id).last
+    return false unless (action_count - 1) % players.count == 0
     self.players.map do |p|
       p.total_point >= 15
     end.uniq != [false]

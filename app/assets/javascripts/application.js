@@ -22,3 +22,4 @@
 //= require_tree .
 //= require websocket_rails/main
 //= require hamlcoffee
+//= require sweet-alert

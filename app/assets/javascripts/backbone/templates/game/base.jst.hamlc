@@ -3,6 +3,5 @@
     #layout-buttons.font-size-4
       %i.layout-full-view.fa.fa-th
       %i.layout-my-view.fa.fa-th-large
-    -##run-robot.font-size-2
-    -#  %i.fa.fa-android
-    -#  %i.fa.fa-play
+    #turn-count.font-size-4
+      = @model.turnCount

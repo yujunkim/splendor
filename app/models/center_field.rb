@@ -54,11 +54,10 @@ class CenterField
 
   def pickup_unrevealed_card(grade)
     card = cards[:pack][grade].sample
-    if card
-      cards[:pack][grade].delete(card)
-      cards[:exhibition][grade] << card
-      card.reveal
-    end
+    return unless cards[:exhibition][grade].count <= 3 && card
+    cards[:pack][grade].delete(card)
+    cards[:exhibition][grade] << card
+    card.reveal
     card
   end
 

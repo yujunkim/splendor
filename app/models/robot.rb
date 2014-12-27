@@ -4,7 +4,7 @@ class Robot
 
   def self.play(game)
     fork do
-      sleep(0.1)
+      sleep(0.3)
       robot_player = game.players.first
       action_result = nil
       begin

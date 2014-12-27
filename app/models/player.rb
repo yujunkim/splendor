@@ -70,6 +70,7 @@ class Player
   end
 
   def purchase(card)
+    self.reserved_cards.delete(card)
     self.purchased_cards[card.jewel_type] << card
   end
 

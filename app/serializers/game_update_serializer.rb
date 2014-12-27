@@ -2,6 +2,7 @@ class GameUpdateSerializer < ActiveModel::Serializer
   attributes :id,
              :currentTurnPlayerId,
              :playerId,
+             :turnCount,
              :hiredNoble,
              :purchasedCard,
              :reservedCard,
