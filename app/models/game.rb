@@ -130,13 +130,9 @@ class Game
       puts "sended"
       self.after_action(player, method, action_opts)
     else
-      binding.pry
       Rails.logger.info(player)
       Rails.logger.info(options)
     end
-
-  rescue Exception => e
-    binding.pry
 
   end
 
