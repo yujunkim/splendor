@@ -57,7 +57,7 @@ class BSplendor.Views.Operator.Base extends Backbone.View
     e.preventDefault()
     messageEl = @$el.find('#message')
     message = messageEl.val()
-    splendorController.dispatcher.trigger 'new_message', message
+    splendorController.dispatcher.trigger 'new_message', message if message?
     messageEl.val('')
 
   render: ->

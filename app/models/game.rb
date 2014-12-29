@@ -86,7 +86,7 @@ class Game
   end
 
   def turn_count
-    1 + (action_count / players.count)
+    1 + ((action_count - 1) / players.count)
   end
 
   alias_method :turnCount, :turn_count
@@ -103,6 +103,7 @@ class Game
 
   def next_turn
     players << players.shift
+    self.action_count += 1
   end
 
   def action(player, options)
@@ -126,7 +127,6 @@ class Game
     if self.validation(method, player, data)
       puts "validation passed"
       action_opts = self.send(method, player, data)
-      self.action_count += 1
       puts "sended"
       self.after_action(player, method, action_opts)
     else
@@ -193,7 +193,7 @@ class Game
   end
 
   def game_over(player)
-    return false unless (action_count - 1) % players.count == 0
+    return false unless action_count % players.count == 0
     self.players.map do |p|
       p.total_point >= 15
     end.uniq != [false]
