@@ -3,10 +3,17 @@ class SplendorWebsocketController < WebsocketRails::BaseController
   include CurrentUser
 
   def user_msg(ev, msg)
+    time = Time.now.strftime("%Y-%m-%d %H:%M:%S")
+    Splendor::Application::Messages << {
+      user: current_user,
+      text: msg,
+      time: time
+    }
+
     broadcast_message ev, userId: current_user.id,
                           userName: current_user.name,
                           userPhotoUrl: current_user.photo_url,
-                          received: Time.now.strftime("%Y-%m-%d %H:%M:%S"),
+                          received: time,
                           text: ERB::Util.html_escape(msg)
   end
 
@@ -88,10 +95,6 @@ class SplendorWebsocketController < WebsocketRails::BaseController
     current_user.add_facebook_user message[:facebook_user]
     update_users
     user_msg :new_message, "joined chat room"
-  end
-
-  def hi
-    binding.pry
   end
 
   def client_connected

@@ -212,6 +212,8 @@ class Game
     top_players = card_count2player.sort.reverse.first.last
     self.winner = top_players.sample
 
+    winner.has_win = true
+
     winner
   end
 
@@ -270,5 +272,16 @@ class Game
       received_jewel_chips: received_jewel_chips,
       returned_jewel_chips: returned_jewel_chips
     }
+  end
+
+
+  def winner_name
+    return "Not End" unless winner
+
+    if winner.user
+      winner.user.name
+    else
+      "Robot"
+    end
   end
 end

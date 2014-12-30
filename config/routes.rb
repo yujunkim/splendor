@@ -6,6 +6,12 @@ Rails.application.routes.draw do
       get :robot_play
     end
   end
+
+  namespace :status do
+    get :messages
+    get :games
+    get :users
+  end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

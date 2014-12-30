@@ -28,6 +28,7 @@ class Player
                 :color,
                 :is_robot,
                 :is_chief,
+                :has_win,
                 :home
 
   alias_method :isRobot, :is_robot
@@ -39,6 +40,7 @@ class Player
     self.game = options[:game]
     self.user = options[:user]
     self.is_robot = !!options[:is_robot]
+    self.has_win = false
     if user
       user.players << self
       self.is_robot = user.is_robot

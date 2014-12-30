@@ -1,0 +1,15 @@
+table.table.table-hover
+  thead
+    tr
+      th user name
+      th message
+      th time
+  tbody
+    - @messages.each do |messages|
+      tr
+        td
+          = messages[:user].name
+        td
+          = messages[:text]
+        td
+          = messages[:time]

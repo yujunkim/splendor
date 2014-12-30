@@ -1,0 +1,15 @@
+table.table.table-hover
+  thead
+    tr
+      th winner
+      th player count
+      th turn count
+  tbody
+    - @games.each do |game|
+      tr
+        td
+          = game.winner_name
+        td
+          = game.players.count
+        td
+          = game.turn_count

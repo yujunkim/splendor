@@ -1,0 +1,22 @@
+table.table.table-hover
+  thead
+    tr
+      th user name
+      th user play count
+      th user win count
+      th user win rate
+  tbody
+    - @users.each do |user|
+      - play_count = user.players.count
+      - win_count = user.players.select(&:has_win).count
+      - win_rate = win_count.to_f / play_count
+      tr
+        td
+          = user.name
+        td
+          = play_count
+        td
+          = win_count
+        td
+          = (win_rate * 100).round(2)
+          |%
