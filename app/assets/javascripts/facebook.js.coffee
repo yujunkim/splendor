@@ -9,7 +9,7 @@
   return
 ) document, "script", "facebook-jssdk"
 
-window.fbAsyncInit = ->
+window.fbAsyncInit = =>
   FB.init
     appId: "542101129259820"
     cookie: true
