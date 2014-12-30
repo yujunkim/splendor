@@ -288,12 +288,6 @@ body
 .card-view
   width: 100%
   position: absolute
-  &.hovered
-    z-index: 1
-    .card-padder
-      .card
-        .hover-view
-          display: block
   .card-padder
     width: 100%
     padding-bottom: 142.85%
@@ -320,10 +314,6 @@ body
         background-repeat: no-repeat
         background-position: center center
 
-      &.purchasable-player-me
-        .hover-view
-          .reserve, .purchase
-            width: 50%
       .hover-view
         cursor: pointer
         position: absolute
@@ -417,14 +407,6 @@ body
     @for $i from 1 through 50
       .card-view.card-view-#{$i}
         margin-top: #{$i * -0.2%}
-    .card-view.hovered
-      .card-padder
-        .card
-          .hover-view
-            .reserve
-              width: 100%
-            .purchase
-              display: none
 
   &.card-list-exhibition
     @for $i from 1 through 4
@@ -436,24 +418,11 @@ body
       .card-view.card-view-#{$i}
         margin-top: #{$i * 30%}
         left: #{$i * 30%}
-    .card-view.hovered
-      .card-padder
-        .card
-          .hover-view
-            .purchase
-              width: 100%
-            .reserve
-              display: none
 
   &.card-list-purchased
     @for $i from 1 through 20
       .card-view.card-view-#{$i}
         margin-top: #{$i * 30%}
-    .card-view.hovered
-      .card-padder
-        .card
-          .hover-view
-            display: none
 
 .jewel-chip-padder
   width: 100%
@@ -606,23 +575,11 @@ body
         -webkit-transform: rotate(270deg)
         top: 25%
         left: 60%
-      .card-list
-        .card-view.hovered
-          .card-padder
-            .card
-              .hover-view
-                display: none
     &.me
       width: 54%
       height: 30%
       top: 70%
       left: 27%
-      .card-list
-        .card-view.hovered
-          .card-padder
-            .card:not(.purchasable-player-me)
-              .hover-view
-                display: none
     &.current-turn
       > .header
         color: darkred
@@ -659,6 +616,8 @@ body
       position: absolute
       width: 9.662%
       left: 83.091%
+      .jewel-chip:not(.gold)
+        cursor: pointer
     .jewel-chip-list.diamond
       top: 8%
     .jewel-chip-list.sapphire
@@ -695,11 +654,6 @@ body
       width: 43%
       left: 52%
       top: 20%
-      .card-view.hovered
-        .card-padder
-          .card
-            .hover-view
-              display: none
     .jewel-chip-list.receive
       position: absolute
       //width: 23.390%
@@ -787,13 +741,6 @@ body
     background-image: image-url("winner.jpg")
     background-size: cover
     background-position: center center
-  #run-robot
-    position: absolute
-    bottom: 0
-    color: white
-    cursor: pointer
-    &:hover
-      color: coral
   #turn-count
     color: white
     right: 18%
@@ -836,7 +783,56 @@ body
       height: 37%
       top: 64%
       left: 2%
+  &.my-turn
+    .player.me, .center-field, .action-field
+      .jewel-chip-list
+        .jewel-chip
+          cursor: pointer
 
+    .action-field
+      .card
+        cursor: pointer
+
+    .center-field
+      .card-list.card-list-pack
+        .card-view.hovered
+          z-index: 1
+          .card-padder
+            .card
+              .hover-view
+                display: block
+                .reserve
+                  width: 100%
+                .purchase
+                  display: none
+      .card-list.card-list-exhibition
+        .card-view.hovered
+          z-index: 1
+          .card-padder
+            .card.purchasable-player-me
+              .hover-view
+                display: block
+                .reserve, .purchase
+                  width: 50%
+            .card:not(.purchasable-player-me)
+              .hover-view
+                display: block
+                .reserve
+                  width: 100%
+                .purchase
+                  display: none
+    .player.me
+      .card-list.card-list-reservation
+        .card-view.hovered
+          z-index: 1
+          .card-padder
+            .card.purchasable-player-me
+              .hover-view
+                display: block
+                .reserve
+                  display: none
+                .purchase
+                  width: 100%
 
 .game-view
   width: 100%

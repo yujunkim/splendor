@@ -72,11 +72,13 @@ class Player
   end
 
   def purchase(card)
+    card.player = self
     self.reserved_cards.delete(card)
     self.purchased_cards[card.jewel_type] << card
   end
 
   def reserve(card)
+    card.player = self
     self.reserved_cards << card
   end
 
@@ -87,6 +89,7 @@ class Player
     result = []
     jewel_chip_map.each do |jewel_type, count|
       game.center_field.jewel_chips[jewel_type].first(count).each do |jewel_chip|
+        jewel_chip.player = self
         game.center_field.jewel_chips[jewel_type].delete(jewel_chip)
         jewel_chips[jewel_type] << jewel_chip
         result << jewel_chip
@@ -102,6 +105,7 @@ class Player
     result = []
     jewel_chip_map.each do |jewel_type, count|
       jewel_chips[jewel_type].first(count).each do |jewel_chip|
+        jewel_chip.player = nil
         game.center_field.jewel_chips[jewel_type] << jewel_chip
         jewel_chips[jewel_type].delete(jewel_chip)
         result << jewel_chip
@@ -111,6 +115,7 @@ class Player
   end
 
   def hire(noble)
+    noble.player = self
     self.nobles << noble
   end
 

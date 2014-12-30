@@ -15,6 +15,8 @@ class BSplendor.Views.Game.Base extends Backbone.View
   initialize: () ->
     @model.on 'reset-end', @render, @
     @model.on 'game.over', @addStatField, @
+    @model.on 'game.turn.me', @addMyTurnClass, @
+    @model.on 'game.turn.others', @addOthersTurnClass, @
 
   mousemoved: (e)->
     game.resetHighlightPurchasableCards()
@@ -38,6 +40,10 @@ class BSplendor.Views.Game.Base extends Backbone.View
       game.append view.el
 
     game.addClass("game-#{@model.players.length}players")
+    if @model.playerTurn(@model.me)
+      game.addClass("my-turn")
+    else
+      game.addClass("others-turn")
 
     playerPositions = switch @model.players.length
       when 2 then ["bottom", "top"]
@@ -63,6 +69,12 @@ class BSplendor.Views.Game.Base extends Backbone.View
         model: @model.statField
       view.render()
       @$el.find(".game").append view.el
+
+  addMyTurnClass: (e) ->
+    @$el.find(".game").removeClass("others-turn").addClass("my-turn")
+
+  addOthersTurnClass: (e) ->
+    @$el.find(".game").removeClass("my-turn").addClass("others-turn")
 
   fullView: ->
     @$el.find(".game").addClass("full-view").removeClass("my-view")

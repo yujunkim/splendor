@@ -155,9 +155,12 @@ class BSplendor.Models.Game extends Backbone.Model
       else
         player.set(currentTurn: undefined)
     if @playerTurn(@me)
+      @trigger("game.turn.me")
       @alertTimeout = setTimeout( ->
         $("body").addClass("alert-opacity")
       , 5000)
+    else
+      @trigger("game.turn.others")
 
   clearAlertTimeout: ()=>
     if @alertTimeout

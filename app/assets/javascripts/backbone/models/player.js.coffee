@@ -73,7 +73,7 @@ class BSplendor.Models.Player extends Backbone.Model
 
   totalJewelChipCount: ()=>
     count = 0
-    _.each @jewelChip, (collection, jewelType) ->
+    _.each @jewelChips, (collection, jewelType) ->
       count += collection.length
     count
 
@@ -102,6 +102,8 @@ class BSplendor.Models.Player extends Backbone.Model
 
   purchasable: (card) =>
     able = true
+    able = false unless card.get("jewelType")
+
     goldCount = @jewelChips["gold"].length
     _.each card.get("costs"), (cost, jewelType) =>
       return unless able

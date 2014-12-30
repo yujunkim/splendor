@@ -91,6 +91,10 @@ class SplendorWebsocketController < WebsocketRails::BaseController
     game.action(game.players.first, message)
   end
 
+  #def hi
+  #  binding.pry
+  #end
+
   def login
     current_user.add_facebook_user message[:facebook_user]
     update_users
