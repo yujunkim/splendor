@@ -3,7 +3,7 @@ class Robot
   require 'open-uri'
 
   def self.play(game)
-    fork do
+    pid = fork do
       sleep(0.3)
       robot_player = game.players.first
       action_result = nil
@@ -56,6 +56,8 @@ class Robot
         end
       end
     end
+
+    Process.detach(pid)
   end
 
 end
