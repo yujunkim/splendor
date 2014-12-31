@@ -46,3 +46,4 @@ gem 'thrift'
 gem 'thrift_client'
 gem 'rails_12factor', group: :production
 gem 'kaminari'
+gem 'newrelic_rpm'

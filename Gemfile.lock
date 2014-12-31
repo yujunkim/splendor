@@ -92,6 +92,7 @@ GEM
     mime-types (1.25.1)
     minitest (5.5.0)
     multi_json (1.10.1)
+    newrelic_rpm (3.8.1.221)
     polyglot (0.3.5)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -201,6 +202,7 @@ DEPENDENCIES
   jquery-rails
   kaminari
   less-rails
+  newrelic_rpm
   pry-rails
   rails (= 4.1.2)
   rails-backbone
