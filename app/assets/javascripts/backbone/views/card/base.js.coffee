@@ -23,8 +23,11 @@ class BSplendor.Views.Card.Base extends Backbone.View
     @changePurchasablePlayerClass()
 
   changePurchasablePlayerClass: =>
-    @$el.find(".card").removeClass (idx, cls) ->
-      cls.match("purchasable-player")
+    @$el.find(".card").removeClass () ->
+      ret = ""
+      @className.split(' ').forEach (cls) ->
+        ret += cls + " " if cls.match("purchasable-player")
+      ret
     @model.purchasablePlayer.forEach (player) =>
       @$el.find(".card").addClass("purchasable-player-#{player.get("id")}")
       if player.get("isMe")

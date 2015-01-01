@@ -400,6 +400,8 @@ body
             .round.onyx
               background-image: image-url("rounds/onyx.png")
 
+  &.hovered
+    z-index: 1
 
 .card-list
   position: relative
@@ -616,8 +618,6 @@ body
       position: absolute
       width: 9.662%
       left: 83.091%
-      .jewel-chip:not(.gold)
-        cursor: pointer
     .jewel-chip-list.diamond
       top: 8%
     .jewel-chip-list.sapphire
@@ -784,9 +784,13 @@ body
       top: 64%
       left: 2%
   &.my-turn
-    .player.me, .center-field, .action-field
+    .player.me, .action-field
       .jewel-chip-list
         .jewel-chip
+          cursor: pointer
+    .center-field
+      .jewel-chip-list
+        .jewel-chip:not(.gold)
           cursor: pointer
 
     .action-field

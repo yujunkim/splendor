@@ -256,11 +256,13 @@ class Game
     revealed_card = center_field.pickup_unrevealed_card(reserved_card.card_grade)
 
     received_jewel_chips = player.receive(self, data[:receiveJewelChipMap])
+    returned_jewel_chips = player.return(self, data[:returnJewelChipMap])
 
     {
       reserved_card: reserved_card,
       revealed_card: revealed_card,
-      received_jewel_chips: received_jewel_chips
+      received_jewel_chips: received_jewel_chips,
+      returned_jewel_chips: returned_jewel_chips
     }
   end
 
