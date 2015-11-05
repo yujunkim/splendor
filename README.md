@@ -9,3 +9,5 @@ splendor
   - [Websocket Rails](https://github.com/websocket-rails/websocket-rails) ON Communication(with Client)
   - [Thrift](https://github.com/apache/thrift) ON Communication(with AI)
   
+### screenshot
+![screenshot](/screenshot.jpg "screenshot")
